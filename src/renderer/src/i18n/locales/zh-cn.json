@@ -373,6 +373,7 @@
         "label": "默认模型组",
         "save": "保存为默认模型组",
         "saveDescription": "将当前选择的模型保存为该助手的默认模型组",
+        "save_failed": "保存默认模型组失败",
         "saved": "默认模型组已保存"
       },
       "knowledge_base": {
