@@ -272,11 +272,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
               onClick={async () => {
                 const selectedModel = await SelectModelPopup.show({ filter: modelFilter })
                 if (selectedModel) {
-                  const modelKey = getModelUniqId(selectedModel)
-                  // Avoid duplicates
-                  if (!defaultModels.some((m) => getModelUniqId(m) === modelKey)) {
-                    updateAssistant({ ...assistant, defaultModels: [...defaultModels, selectedModel] })
-                  }
+                  updateAssistant({ ...assistant, defaultModels: [...defaultModels, selectedModel] })
                 }
               }}>
               {t('assistants.settings.add_model')}
