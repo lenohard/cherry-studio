@@ -246,7 +246,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
       {!isAgentPreset && (
         <>
           <HStack alignItems="center" justifyContent="space-between" style={{ marginBottom: 10 }}>
-            <Label>{t('assistants.settings.default_models')}</Label>
+            <Label>{t('assistants.settings.default_models.label')}</Label>
           </HStack>
           <HStack alignItems="center" gap={5} style={{ flexWrap: 'wrap', marginBottom: 10 }}>
             {defaultModels.map((model) => {
