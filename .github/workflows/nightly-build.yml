@@ -40,8 +40,8 @@ jobs:
           echo "Should run: ${{ github.repository == 'CherryHQ/cherry-studio' }}"
 
   nightly-build:
-    needs: check-repository
-    if: needs.check-repository.outputs.should_run == 'true'
+    # needs: check-repository  # Disabled for fork builds
+    # if: needs.check-repository.outputs.should_run == 'true'  # Disabled for fork builds
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -52,8 +52,7 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v5
-        with:
-          ref: main
+        # Removed 'ref: main' to build the branch that triggered the workflow
 
       - name: Install Node.js
         uses: actions/setup-node@v5
