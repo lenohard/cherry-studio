@@ -482,7 +482,12 @@
     "settings": {
       "add_model": "Add Model",
       "default_model": "Default Model",
-      "default_models": "Default Models",
+      "default_models": {
+        "label": "Default Models",
+        "save": "Save as Default",
+        "saveDescription": "Save current model selection as default for this assistant",
+        "saved": "Default models saved successfully"
+      },
       "knowledge_base": {
         "label": "Knowledge Base Settings",
         "recognition": {

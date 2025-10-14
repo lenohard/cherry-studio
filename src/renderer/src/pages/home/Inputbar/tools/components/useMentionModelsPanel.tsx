@@ -3,6 +3,7 @@ import type { QuickPanelListItem } from '@renderer/components/QuickPanel'
 import { QuickPanelReservedSymbol } from '@renderer/components/QuickPanel'
 import { getModelLogo, isEmbeddingModel, isRerankModel, isVisionModel } from '@renderer/config/models'
 import db from '@renderer/databases'
+import { useAssistant } from '@renderer/hooks/useAssistant'
 import { useProviders } from '@renderer/hooks/useProvider'
 import type { ToolQuickPanelApi, ToolQuickPanelController } from '@renderer/pages/home/Inputbar/types'
 import { getModelUniqId } from '@renderer/services/ModelService'
@@ -12,7 +13,7 @@ import { getFancyProviderName } from '@renderer/utils'
 import { Avatar } from 'antd'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { first, sortBy } from 'lodash'
-import { AtSign, CircleX, Plus } from 'lucide-react'
+import { AtSign, CircleX, Plus, Save } from 'lucide-react'
 import type React from 'react'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -24,6 +25,7 @@ export type MentionTriggerInfo = { type: 'input' | 'button'; position?: number; 
 interface Params {
   quickPanel: ToolQuickPanelApi
   quickPanelController: ToolQuickPanelController
+  assistantId: string
   mentionedModels: Model[]
   setMentionedModels: React.Dispatch<React.SetStateAction<Model[]>>
   couldMentionNotVisionModel: boolean
@@ -35,6 +37,7 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
   const {
     quickPanel,
     quickPanelController,
+    assistantId,
     mentionedModels,
     setMentionedModels,
     couldMentionNotVisionModel,
@@ -44,6 +47,7 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
   const { registerRootMenu, registerTrigger } = quickPanel
   const { open, close, updateList, isVisible, symbol } = quickPanelController
   const { providers } = useProviders()
+  const { assistant, updateAssistant } = useAssistant(assistantId)
   const { t } = useTranslation()
   const navigate = useNavigate()
 
@@ -199,6 +203,19 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
     })
 
     items.unshift({
+      label: t('assistants.settings.default_models.save'),
+      description: t('assistants.settings.default_models.saveDescription'),
+      icon: <Save />,
+      alwaysVisible: true,
+      isSelected: false,
+      action: ({ context }) => {
+        updateAssistant({ ...assistant, defaultModels: mentionedModels })
+        window.toast?.success?.(t('assistants.settings.default_models.saved'))
+        context.close()
+      }
+    })
+
+    items.unshift({
       label: t('settings.input.clear.all'),
       description: t('settings.input.clear.models'),
       icon: <CircleX />,
@@ -221,6 +238,7 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
 
     return items
   }, [
+    assistant,
     couldMentionNotVisionModel,
     mentionedModels,
     navigate,
@@ -230,7 +248,8 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
     providers,
     removeAtSymbolAndText,
     setText,
-    t
+    t,
+    updateAssistant
   ])
 
   const openQuickPanel = useCallback(
