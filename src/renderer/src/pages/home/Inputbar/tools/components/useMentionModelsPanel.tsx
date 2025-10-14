@@ -1,3 +1,4 @@
+import { loggerService } from '@logger'
 import ModelTagsWithLabel from '@renderer/components/ModelTagsWithLabel'
 import type { QuickPanelListItem } from '@renderer/components/QuickPanel'
 import { QuickPanelReservedSymbol } from '@renderer/components/QuickPanel'
@@ -19,6 +20,8 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import styled from 'styled-components'
+
+const logger = loggerService.withContext('MentionModelsPanel')
 
 export type MentionTriggerInfo = { type: 'input' | 'button'; position?: number; originalText?: string }
 
@@ -208,10 +211,15 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
       icon: <Save />,
       alwaysVisible: true,
       isSelected: false,
-      action: ({ context }) => {
-        updateAssistant({ ...assistant, defaultModels: mentionedModels })
-        window.toast?.success?.(t('assistants.settings.default_models.saved'))
-        context.close()
+      action: async ({ context }) => {
+        try {
+          await updateAssistant({ ...assistant, defaultModels: mentionedModels })
+          window.toast?.success?.(t('assistants.settings.default_models.saved'))
+          context.close()
+        } catch (error) {
+          window.toast?.error?.(t('assistants.settings.default_models.save_failed'))
+          logger.error('Failed to save default models', error as Error)
+        }
       }
     })
 

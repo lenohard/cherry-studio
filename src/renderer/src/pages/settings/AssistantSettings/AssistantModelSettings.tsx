@@ -283,11 +283,6 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
               onClick={async () => {
                 const selectedModel = await SelectModelPopup.show({ filter: modelFilter })
                 if (selectedModel) {
-                  const modelKey = getModelUniqId(selectedModel)
-                  if (defaultModels.some((model) => getModelUniqId(model) === modelKey)) {
-                    window.toast?.warning?.(t('assistants.settings.default_models.duplicate'))
-                    return
-                  }
                   updateAssistant({ ...assistant, defaultModels: [...defaultModels, selectedModel] })
                 }
               }}>

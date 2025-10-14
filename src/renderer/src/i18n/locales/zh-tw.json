@@ -486,6 +486,7 @@
         "label": "預設模型組",
         "save": "儲存為預設模型組",
         "saveDescription": "將目前選擇的模型儲存為此助手的預設模型組",
+        "save_failed": "儲存預設模型組失敗",
         "saved": "預設模型組已儲存"
       },
       "knowledge_base": {
