@@ -507,11 +507,24 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
     // Reset to assistant default model
     assistant.defaultModel && setModel(assistant.defaultModel)
 
+    // Clear mentioned models cache and reset to defaults
+    delete _mentionedModelsCache[assistant.id]
+    manualMentionUpdateRef.current = false
+    setMentionedModelsState(assistant.defaultModels ?? [])
+
     addTopic(topic)
     setActiveTopic(topic)
 
     setTimeoutTimer('addNewTopic', () => EventEmitter.emit(EVENT_NAMES.SHOW_TOPIC_SIDEBAR), 0)
-  }, [addTopic, assistant.defaultModel, assistant.id, setActiveTopic, setModel, setTimeoutTimer])
+  }, [
+    addTopic,
+    assistant.defaultModel,
+    assistant.defaultModels,
+    assistant.id,
+    setActiveTopic,
+    setModel,
+    setTimeoutTimer
+  ])
 
   const onQuote = useCallback(
     (text: string) => {

@@ -369,7 +369,12 @@
     "settings": {
       "add_model": "添加模型",
       "default_model": "默认模型",
-      "default_models": "默认模型组",
+      "default_models": {
+        "label": "默认模型组",
+        "save": "保存为默认模型组",
+        "saveDescription": "将当前选择的模型保存为该助手的默认模型组",
+        "saved": "默认模型组已保存"
+      },
       "knowledge_base": {
         "label": "知识库设置",
         "recognition": {
