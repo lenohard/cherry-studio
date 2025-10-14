@@ -9,7 +9,8 @@ import { DEFAULT_CONTEXTCOUNT, DEFAULT_TEMPERATURE, MAX_CONTEXT_COUNT } from '@r
 import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
 import { useTimer } from '@renderer/hooks/useTimer'
 import { SettingRow } from '@renderer/pages/settings'
-import type { Assistant, AssistantSettingCustomParameters, AssistantSettings, Model } from '@renderer/types'
+import { getModelUniqId } from '@renderer/services/ModelService'
+import { Assistant, AssistantSettingCustomParameters, AssistantSettings, Model } from '@renderer/types'
 import { modalConfirm } from '@renderer/utils'
 import { Button, Col, Divider, Input, InputNumber, Row, Select, Slider, Switch, Tooltip } from 'antd'
 import { isNull } from 'lodash'
@@ -34,11 +35,16 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
   const [toolUseMode, setToolUseMode] = useState(assistant?.settings?.toolUseMode ?? 'prompt')
   const [defaultModel, setDefaultModel] = useState(assistant?.defaultModel)
   const [topP, setTopP] = useState(assistant?.settings?.topP ?? 1)
-  const [enableTopP, setEnableTopP] = useState(assistant?.settings?.enableTopP ?? false)
+  const [enableTopP, setEnableTopP] = useState(assistant?.settings?.enableTopP ?? true)
   const [customParameters, setCustomParameters] = useState<AssistantSettingCustomParameters[]>(
     assistant?.settings?.customParameters ?? []
   )
   const [enableTemperature, setEnableTemperature] = useState(assistant?.settings?.enableTemperature ?? true)
+  const [enableDefaultModelMentions, setEnableDefaultModelMentions] = useState(
+    assistant?.enableDefaultModelMentions ?? true
+  )
+  const isAgentPreset = assistant.type === 'agent'
+  const defaultModels = assistant.defaultModels ?? []
 
   const customParametersRef = useRef(customParameters)
 
@@ -165,7 +171,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
     setMaxTokens(0)
     setStreamOutput(true)
     setTopP(1)
-    setEnableTopP(false)
+    setEnableTopP(true)
     setCustomParameters([])
     setToolUseMode('prompt')
     updateAssistantSettings({
@@ -176,7 +182,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
       maxTokens: 0,
       streamOutput: true,
       topP: 1,
-      enableTopP: false,
+      enableTopP: true,
       customParameters: [],
       toolUseMode: 'prompt'
     })
@@ -239,6 +245,58 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
         </HStack>
       </HStack>
       <Divider style={{ margin: '10px 0' }} />
+
+      {/* Default Models Section */}
+      {!isAgentPreset && (
+        <>
+          <HStack alignItems="center" justifyContent="space-between" style={{ marginBottom: 10 }}>
+            <Label>{t('assistants.settings.default_models.label')}</Label>
+            <Switch
+              checked={enableDefaultModelMentions}
+              onChange={(checked) => {
+                setEnableDefaultModelMentions(checked)
+                updateAssistant({ ...assistant, enableDefaultModelMentions: checked })
+              }}
+            />
+          </HStack>
+          <HStack alignItems="center" gap={5} style={{ flexWrap: 'wrap', marginBottom: 10 }}>
+            {defaultModels.map((model) => {
+              const modelKey = getModelUniqId(model)
+              return (
+                <ModelChip key={modelKey}>
+                  <ModelAvatar model={model} size={16} />
+                  <ModelChipName>{model.name}</ModelChipName>
+                  <DeleteIcon
+                    size={14}
+                    className="lucide-custom"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      const newModels = defaultModels.filter((m) => getModelUniqId(m) !== modelKey)
+                      updateAssistant({ ...assistant, defaultModels: newModels })
+                    }}
+                  />
+                </ModelChip>
+              )
+            })}
+            <Button
+              icon={<PlusIcon size={16} />}
+              onClick={async () => {
+                const selectedModel = await SelectModelPopup.show({ filter: modelFilter })
+                if (selectedModel) {
+                  const modelKey = getModelUniqId(selectedModel)
+                  if (defaultModels.some((model) => getModelUniqId(model) === modelKey)) {
+                    window.toast?.warning?.(t('assistants.settings.default_models.duplicate'))
+                    return
+                  }
+                  updateAssistant({ ...assistant, defaultModels: [...defaultModels, selectedModel] })
+                }
+              }}>
+              {t('assistants.settings.add_model')}
+            </Button>
+          </HStack>
+          <Divider style={{ margin: '10px 0' }} />
+        </>
+      )}
 
       <SettingRow style={{ minHeight: 30 }}>
         <HStack alignItems="center">
@@ -360,7 +418,6 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
                 setTimeoutTimer('contextCount_onChange', () => updateAssistantSettings({ contextCount: value }), 500)
               }
             }}
-            formatter={(value) => (value === MAX_CONTEXT_COUNT ? t('chat.settings.max') : (value ?? ''))}
             style={{ width: '100%' }}
           />
         </Col>
@@ -375,7 +432,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
             value={typeof contextCount === 'number' ? contextCount : 0}
             marks={{ 0: '0', 25: '25', 50: '50', 75: '75', 100: t('chat.settings.max') }}
             step={1}
-            tooltip={{ formatter: formatSliderTooltip, open: false }}
+            tooltip={{ formatter: formatSliderTooltip }}
           />
         </Col>
       </Row>
@@ -539,6 +596,21 @@ const ModelName = styled.span`
   text-overflow: ellipsis;
   white-space: nowrap;
   display: inline-block;
+`
+
+const ModelChip = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--color-border);
+`
+
+const ModelChipName = styled.span`
+  font-size: 13px;
+  color: var(--color-text-1);
 `
 
 export default AssistantModelSettings

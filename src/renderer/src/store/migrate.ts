@@ -1999,6 +1999,7 @@ const migrateConfig = {
       })
       state.assistants.assistants.forEach((assistant) => {
         updateModelTextDelta(assistant.defaultModel)
+        assistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
         updateModelTextDelta(assistant.model)
       })
 
@@ -2009,6 +2010,7 @@ const migrateConfig = {
       if (state.assistants.defaultAssistant.model) {
         updateModelTextDelta(state.assistants.defaultAssistant.model)
         updateModelTextDelta(state.assistants.defaultAssistant.defaultModel)
+        state.assistants.defaultAssistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
       }
 
       addProvider(state, 'aws-bedrock')
@@ -2578,6 +2580,11 @@ const migrateConfig = {
         if (assistant.defaultModel?.provider === 'cherryin') {
           assistant.defaultModel.provider = 'cherryai'
         }
+        assistant.defaultModels?.forEach((model) => {
+          if (model.provider === 'cherryin') {
+            model.provider = 'cherryai'
+          }
+        })
       })
 
       // @ts-ignore
@@ -2589,6 +2596,14 @@ const migrateConfig = {
         }
         if (agent.defaultModel?.provider === 'cherryin') {
           agent.defaultModel.provider = 'cherryai'
+        }
+      })
+      if (state.assistants.defaultAssistant.defaultModel?.provider === 'cherryin') {
+        state.assistants.defaultAssistant.defaultModel.provider = 'cherryai'
+      }
+      state.assistants.defaultAssistant.defaultModels?.forEach((model) => {
+        if (model.provider === 'cherryin') {
+          model.provider = 'cherryai'
         }
       })
       return state

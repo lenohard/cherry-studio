@@ -16,24 +16,19 @@ const mentionModelsTool = defineTool({
 
   visibleInScopes: [TopicType.Chat, 'mini-window'],
   dependencies: {
-    state: ['mentionedModels', 'files', 'couldMentionNotVisionModel'] as const,
-    actions: ['setMentionedModels', 'onTextChange'] as const
+    state: ['mentionedModels', 'files', 'couldMentionNotVisionModel', 'defaultMentionsEnabled'] as const,
+    actions: ['setMentionedModels', 'onTextChange', 'toggleDefaultMentions'] as const
   },
 
   render: function MentionModelsToolRender(context) {
-    const { state, actions, quickPanel, quickPanelController } = context
-    const { mentionedModels, files, couldMentionNotVisionModel } = state
-    const { setMentionedModels, onTextChange } = actions
+    const { state, actions } = context
+    const { defaultMentionsEnabled } = state
+    const { toggleDefaultMentions } = actions
 
     return (
       <MentionModelsButton
-        quickPanel={quickPanel}
-        quickPanelController={quickPanelController}
-        mentionedModels={mentionedModels}
-        setMentionedModels={setMentionedModels}
-        couldMentionNotVisionModel={couldMentionNotVisionModel}
-        files={files}
-        setText={onTextChange as React.Dispatch<React.SetStateAction<string>>}
+        isDefaultMentionsEnabled={defaultMentionsEnabled}
+        onToggleDefaultMentions={toggleDefaultMentions}
       />
     )
   },

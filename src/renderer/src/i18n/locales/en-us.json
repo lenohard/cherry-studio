@@ -480,7 +480,9 @@
     },
     "search": "Search assistants...",
     "settings": {
+      "add_model": "Add Model",
       "default_model": "Default Model",
+      "default_models": "Default Models",
       "knowledge_base": {
         "label": "Knowledge Base Settings",
         "recognition": {

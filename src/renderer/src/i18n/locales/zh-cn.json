@@ -480,7 +480,9 @@
     },
     "search": "搜索助手",
     "settings": {
+      "add_model": "添加模型",
       "default_model": "默认模型",
+      "default_models": "默认模型组",
       "knowledge_base": {
         "label": "知识库设置",
         "recognition": {

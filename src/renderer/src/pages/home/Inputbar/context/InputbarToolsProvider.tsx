@@ -14,6 +14,8 @@ export interface InputbarToolsState {
   files: FileType[]
   /** Models mentioned in the input */
   mentionedModels: Model[]
+  /** Whether default mentions are enabled for the current topic */
+  defaultMentionsEnabled: boolean
   /** Selected knowledge base items */
   selectedKnowledgeBases: KnowledgeBase[]
   /** Whether the inputbar is expanded */
@@ -78,6 +80,7 @@ export interface InputbarToolsDispatch {
   setFiles: React.Dispatch<React.SetStateAction<FileType[]>>
   setMentionedModels: React.Dispatch<React.SetStateAction<Model[]>>
   setSelectedKnowledgeBases: React.Dispatch<React.SetStateAction<KnowledgeBase[]>>
+  setDefaultMentionsEnabled: React.Dispatch<React.SetStateAction<boolean>>
   setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>
 
   /** Parent component actions */
@@ -86,6 +89,7 @@ export interface InputbarToolsDispatch {
   clearTopic: () => void
   onNewContext: () => void
   toggleExpanded: (nextState?: boolean) => void
+  toggleDefaultMentions: () => void
 
   /** Text manipulation (avoids putting text state in Context) */
   onTextChange: (updater: string | ((prev: string) => string)) => void
@@ -145,6 +149,7 @@ interface InputbarToolsProviderProps {
   initialState?: Partial<{
     files: FileType[]
     mentionedModels: Model[]
+    defaultMentionsEnabled: boolean
     selectedKnowledgeBases: KnowledgeBase[]
     isExpanded: boolean
     couldAddImageFile: boolean
@@ -157,6 +162,7 @@ interface InputbarToolsProviderProps {
     onNewContext: () => void
     onTextChange: (updater: string | ((prev: string) => string)) => void
     toggleExpanded: (nextState?: boolean) => void
+    toggleDefaultMentions: () => void
   }
 }
 
@@ -164,6 +170,9 @@ export const InputbarToolsProvider: React.FC<InputbarToolsProviderProps> = ({ ch
   // Core state
   const [files, setFiles] = useState<FileType[]>(initialState?.files || [])
   const [mentionedModels, setMentionedModels] = useState<Model[]>(initialState?.mentionedModels || [])
+  const [defaultMentionsEnabled, setDefaultMentionsEnabled] = useState<boolean>(
+    initialState?.defaultMentionsEnabled ?? true
+  )
   const [selectedKnowledgeBases, setSelectedKnowledgeBases] = useState<KnowledgeBase[]>(
     initialState?.selectedKnowledgeBases || []
   )
@@ -237,7 +246,8 @@ export const InputbarToolsProvider: React.FC<InputbarToolsProviderProps> = ({ ch
       clearTopic: () => actionsRef.current.clearTopic(),
       onNewContext: () => actionsRef.current.onNewContext(),
       onTextChange: (updater: string | ((prev: string) => string)) => actionsRef.current.onTextChange(updater),
-      toggleExpanded: (nextState?: boolean) => actionsRef.current.toggleExpanded(nextState)
+      toggleExpanded: (nextState?: boolean) => actionsRef.current.toggleExpanded(nextState),
+      toggleDefaultMentions: () => actionsRef.current.toggleDefaultMentions()
     }),
     []
   )
@@ -247,6 +257,7 @@ export const InputbarToolsProvider: React.FC<InputbarToolsProviderProps> = ({ ch
     () => ({
       files,
       mentionedModels,
+      defaultMentionsEnabled,
       selectedKnowledgeBases,
       isExpanded,
       couldAddImageFile,
@@ -257,6 +268,7 @@ export const InputbarToolsProvider: React.FC<InputbarToolsProviderProps> = ({ ch
       files,
       mentionedModels,
       selectedKnowledgeBases,
+      defaultMentionsEnabled,
       isExpanded,
       couldAddImageFile,
       couldMentionNotVisionModel,
@@ -289,6 +301,7 @@ export const InputbarToolsProvider: React.FC<InputbarToolsProviderProps> = ({ ch
       setFiles,
       setMentionedModels,
       setSelectedKnowledgeBases,
+      setDefaultMentionsEnabled,
       setIsExpanded,
 
       // Stable actions
