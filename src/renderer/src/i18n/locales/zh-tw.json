@@ -367,7 +367,9 @@
     },
     "search": "搜尋助手...",
     "settings": {
+      "add_model": "新增模型",
       "default_model": "預設模型",
+      "default_models": "預設模型組",
       "knowledge_base": {
         "label": "知識庫設定",
         "recognition": {
