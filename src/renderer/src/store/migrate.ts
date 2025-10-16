@@ -160,46 +160,46 @@ function addSelectionAction(state: RootState, id: string) {
 }
 
 /**
- * Add shortcuts(ids from shortcutsInitialState) after the shortcut(afterId)
- * if afterId is 'first', add to the first
- * if afterId is 'last', add to the last
- */
-function addShortcuts(state: RootState, ids: string[], afterId: string) {
-  const defaultShortcuts = shortcutsInitialState.shortcuts
+  * Add shortcuts(ids from shortcutsInitialState) after the shortcut(afterId)
+  * if afterId is 'first', add to the first
+  * if afterId is 'last', add to the last
+  */
+  function addShortcuts(state: RootState, ids: string[], afterId: string) {
+    const defaultShortcuts = shortcutsInitialState.shortcuts
 
-  // 确保 state.shortcuts 存在
-  if (!state.shortcuts) {
-    return
-  }
+    // 确保 state.shortcuts 存在
+    if (!state.shortcuts) {
+      return
+    }
 
-  // 从 defaultShortcuts 中找到要添加的快捷键
-  const shortcutsToAdd = defaultShortcuts.filter((shortcut) => ids.includes(shortcut.key))
+    // 从 defaultShortcuts 中找到要添加的快捷键
+    const shortcutsToAdd = defaultShortcuts.filter((shortcut) => ids.includes(shortcut.key))
 
-  // 过滤掉已经存在的快捷键
-  const existingKeys = state.shortcuts.shortcuts.map((s) => s.key)
-  const newShortcuts = shortcutsToAdd.filter((shortcut) => !existingKeys.includes(shortcut.key))
+    // 过滤掉已经存在的快捷键
+    const existingKeys = state.shortcuts.shortcuts.map((s) => s.key)
+    const newShortcuts = shortcutsToAdd.filter((shortcut) => !existingKeys.includes(shortcut.key))
 
-  if (newShortcuts.length === 0) {
-    return
-  }
+    if (newShortcuts.length === 0) {
+      return
+    }
 
-  if (afterId === 'first') {
-    // 添加到最前面
-    state.shortcuts.shortcuts.unshift(...newShortcuts)
-  } else if (afterId === 'last') {
-    // 添加到最后面
-    state.shortcuts.shortcuts.push(...newShortcuts)
-  } else {
-    // 添加到指定快捷键后面
-    const afterIndex = state.shortcuts.shortcuts.findIndex((shortcut) => shortcut.key === afterId)
-    if (afterIndex !== -1) {
-      state.shortcuts.shortcuts.splice(afterIndex + 1, 0, ...newShortcuts)
-    } else {
-      // 如果找不到指定的快捷键，则添加到最后
+    if (afterId === 'first') {
+      // 添加到最前面
+      state.shortcuts.shortcuts.unshift(...newShortcuts)
+    } else if (afterId === 'last') {
+      // 添加到最后面
       state.shortcuts.shortcuts.push(...newShortcuts)
+    } else {
+      // 添加到指定快捷键后面
+      const afterIndex = state.shortcuts.shortcuts.findIndex((shortcut) => shortcut.key === afterId)
+      if (afterIndex !== -1) {
+        state.shortcuts.shortcuts.splice(afterIndex + 1, 0, ...newShortcuts)
+      } else {
+        // 如果找不到指定的快捷键，则添加到最后
+        state.shortcuts.shortcuts.push(...newShortcuts)
+      }
     }
   }
-}
 
 const migrateConfig = {
   '2': (state: RootState) => {
@@ -337,8 +337,8 @@ const migrateConfig = {
           defaultAssistant: {
             ...state.assistants.defaultAssistant,
             name: ['Default Assistant', '默认助手'].includes(state.assistants.defaultAssistant.name)
-              ? i18n.t('settings.assistant.label')
-              : state.assistants.defaultAssistant.name
+            ? i18n.t('settings.assistant.label')
+            : state.assistants.defaultAssistant.name
           }
         }
       }
@@ -771,10 +771,10 @@ const migrateConfig = {
         state.shortcuts.shortcuts.push({
           key: 'toggle_show_assistants',
           shortcut: [isMac ? 'Command' : 'Ctrl', '['],
-          editable: true,
-          enabled: true,
-          system: false
-        })
+            editable: true,
+            enabled: true,
+            system: false
+          })
         state.shortcuts.shortcuts.push({
           key: 'toggle_show_topics',
           shortcut: [isMac ? 'Command' : 'Ctrl', ']'],
@@ -1980,7 +1980,6 @@ const migrateConfig = {
       })
       state.assistants.assistants.forEach((assistant) => {
         updateModelTextDelta(assistant.defaultModel)
-        assistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
         updateModelTextDelta(assistant.model)
       })
 
@@ -1991,7 +1990,6 @@ const migrateConfig = {
       if (state.assistants.defaultAssistant.model) {
         updateModelTextDelta(state.assistants.defaultAssistant.model)
         updateModelTextDelta(state.assistants.defaultAssistant.defaultModel)
-        state.assistants.defaultAssistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
       }
 
       addProvider(state, 'aws-bedrock')
@@ -2733,6 +2731,29 @@ const migrateConfig = {
       return state
     } catch (error) {
       logger.error('migrate 166 error', error as Error)
+      return state
+    }
+  },
+  '167': (state: RootState) => {
+    try{
+      const updateModelTextDelta = (model?: Model) => {
+        if (model) {
+          model.supported_text_delta = true
+          if (isNotSupportedTextDelta(model)) {
+            model.supported_text_delta = false
+          }
+        }
+      }
+
+      // Update text delta for defaultModels on assistants
+      state.assistants.assistants.forEach((assistant) => {
+        assistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
+      })
+
+      // Update text delta for defaultModels on default assistant
+      state.assistants.defaultAssistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
+    } catch (error) {
+      logger.error('migrate 167 error', error as Error)
       return state
     }
   }
