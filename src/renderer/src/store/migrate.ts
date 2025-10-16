@@ -1980,7 +1980,6 @@ const migrateConfig = {
       })
       state.assistants.assistants.forEach((assistant) => {
         updateModelTextDelta(assistant.defaultModel)
-        assistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
         updateModelTextDelta(assistant.model)
       })
 
@@ -1991,7 +1990,6 @@ const migrateConfig = {
       if (state.assistants.defaultAssistant.model) {
         updateModelTextDelta(state.assistants.defaultAssistant.model)
         updateModelTextDelta(state.assistants.defaultAssistant.defaultModel)
-        state.assistants.defaultAssistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
       }
 
       addProvider(state, 'aws-bedrock')
@@ -2705,6 +2703,31 @@ const migrateConfig = {
       return state
     } catch (error) {
       logger.error('migrate 164 error', error as Error)
+      return state
+    }
+  },
+  '165': (state: RootState) => {
+    try {
+      const updateModelTextDelta = (model?: Model) => {
+        if (model) {
+          model.supported_text_delta = true
+          if (isNotSupportedTextDelta(model)) {
+            model.supported_text_delta = false
+          }
+        }
+      }
+
+      // Update text delta for defaultModels on assistants
+      state.assistants.assistants.forEach((assistant) => {
+        assistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
+      })
+
+      // Update text delta for defaultModels on default assistant
+      state.assistants.defaultAssistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
+
+      return state
+    } catch (error) {
+      logger.error('migrate 165 error', error as Error)
       return state
     }
   }
