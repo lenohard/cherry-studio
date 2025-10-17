@@ -81,7 +81,7 @@ export default class AppUpdater {
     }
     try {
       logger.info(`get release version from github: ${channel}`)
-      const responses = await net.fetch('https://api.github.com/repos/CherryHQ/cherry-studio/releases?per_page=8', {
+      const responses = await net.fetch('https://api.github.com/repos/lenohard/cherry-studio/releases?per_page=8', {
         headers
       })
       const data = (await responses.json()) as GithubReleaseInfo[]
@@ -106,7 +106,7 @@ export default class AppUpdater {
       if (mightHaveLatest) {
         logger.info(`might have latest release, get latest release`)
         const latestReleaseResponse = await net.fetch(
-          'https://api.github.com/repos/CherryHQ/cherry-studio/releases/latest',
+          'https://api.github.com/repos/lenohard/cherry-studio/releases/latest',
           {
             headers
           }
@@ -121,7 +121,7 @@ export default class AppUpdater {
       }
 
       logger.info(`release url is ${release.tag_name}, set channel to ${channel}`)
-      return `https://github.com/CherryHQ/cherry-studio/releases/download/${release.tag_name}`
+      return `https://github.com/lenohard/cherry-studio/releases/download/${release.tag_name}`
     } catch (error) {
       logger.error('Failed to get latest not draft version from github:', error as Error)
       return null
