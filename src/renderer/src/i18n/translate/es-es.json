@@ -370,6 +370,8 @@
       "add_model": "[to be translated]:添加模型",
       "default_model": "Modelo Predeterminado",
       "default_models": {
+        "duplicate": "[to be translated]:该模型已在默认列表中",
+        "enableMentions": "[to be translated]:开启默认模型组",
         "label": "[to be translated]:默认模型组",
         "save": "[to be translated]:保存为默认模型组",
         "saveDescription": "[to be translated]:将当前选择的模型保存为该助手的默认模型组",
