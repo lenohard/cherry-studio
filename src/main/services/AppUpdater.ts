@@ -85,25 +85,33 @@ export default class AppUpdater {
         headers
       })
       const data = (await responses.json()) as GithubReleaseInfo[]
+      let release: GithubReleaseInfo | undefined
       let mightHaveLatest = false
-      const release: GithubReleaseInfo | undefined = data.find((item: GithubReleaseInfo) => {
-        if (!item.draft && !item.prerelease) {
-          mightHaveLatest = true
-        }
 
-        return item.prerelease && item.tag_name.includes(`-${channel}.`)
-      })
+      if (channel === UpgradeChannel.LATEST) {
+        release = data.find((item: GithubReleaseInfo) => !item.draft && !item.prerelease)
+      } else {
+        release = data.find((item: GithubReleaseInfo) => {
+          if (!item.draft && !item.prerelease) {
+            mightHaveLatest = true
+          }
+
+          return item.prerelease && item.tag_name.includes(`-${channel}.`)
+        })
+      }
 
       if (!release) {
         return null
       }
 
+      const releaseVersion = semver.clean(release.tag_name) ?? release.tag_name
+
       // if the release version is the same as the current version, return null
-      if (release.tag_name === app.getVersion()) {
+      if (releaseVersion === app.getVersion()) {
         return null
       }
 
-      if (mightHaveLatest) {
+      if (channel !== UpgradeChannel.LATEST && mightHaveLatest) {
         logger.info(`might have latest release, get latest release`)
         const latestReleaseResponse = await net.fetch(
           'https://api.github.com/repos/lenohard/cherry-studio/releases/latest',
@@ -175,6 +183,14 @@ export default class AppUpdater {
       const channel = this._getTestChannel()
 
       if (channel === UpgradeChannel.LATEST) {
+        const releaseUrl = await this._getReleaseVersionFromGithub(UpgradeChannel.LATEST)
+        if (releaseUrl) {
+          logger.info(`test plan use github latest release feed ${releaseUrl}`)
+          this._setChannel(UpgradeChannel.LATEST, releaseUrl)
+          return
+        }
+
+        logger.warn('Github latest release not found, fallback to latest channel feed')
         this._setChannel(UpgradeChannel.LATEST, FeedUrl.GITHUB_LATEST)
         return
       }
@@ -195,6 +211,22 @@ export default class AppUpdater {
     const ipCountry = await getIpCountry()
     logger.info(`ipCountry is ${ipCountry}, set channel to ${UpgradeChannel.LATEST}`)
     if (ipCountry.toLowerCase() !== 'cn') {
+      const githubPrereleaseUrl = await this._getReleaseVersionFromGithub(UpgradeChannel.BETA)
+      if (githubPrereleaseUrl) {
+        logger.info(`use github prerelease feed ${githubPrereleaseUrl} for ${UpgradeChannel.BETA}`)
+        this._setChannel(UpgradeChannel.BETA, githubPrereleaseUrl)
+        return
+      }
+
+      logger.warn('Github beta release not found, try fallback to github latest release feed')
+      const githubLatestUrl = await this._getReleaseVersionFromGithub(UpgradeChannel.LATEST)
+      if (githubLatestUrl) {
+        logger.info(`use github latest release feed ${githubLatestUrl} for ${UpgradeChannel.LATEST}`)
+        this._setChannel(UpgradeChannel.LATEST, githubLatestUrl)
+        return
+      }
+
+      logger.warn('Github latest release not found, fallback to latest channel feed')
       this._setChannel(UpgradeChannel.LATEST, FeedUrl.GITHUB_LATEST)
     }
   }
