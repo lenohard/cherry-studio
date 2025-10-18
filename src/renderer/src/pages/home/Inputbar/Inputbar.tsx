@@ -113,7 +113,9 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
   const spaceClickTimer = useRef<NodeJS.Timeout>(null)
   const [isTranslating, setIsTranslating] = useState(false)
   const [selectedKnowledgeBases, setSelectedKnowledgeBases] = useState<KnowledgeBase[]>([])
-  const [mentionedModels, setMentionedModelsState] = useState<Model[]>(assistant.defaultModels ?? [])
+  const [mentionedModels, setMentionedModelsState] = useState<Model[]>(
+    assistant.enableDefaultModelMentions !== false ? (assistant.defaultModels ?? []) : []
+  )
   const manualMentionUpdateRef = useRef(false)
   const setMentionedModels = useCallback(
     (value: React.SetStateAction<Model[]>) => {
@@ -234,21 +236,22 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
       setMentionedModelsState(cached)
     } else {
       manualMentionUpdateRef.current = false
-      setMentionedModelsState(assistant.defaultModels ?? [])
+      const defaultModels = assistant.enableDefaultModelMentions !== false ? (assistant.defaultModels ?? []) : []
+      setMentionedModelsState(defaultModels)
     }
-  }, [assistant.defaultModels, assistant.id])
+  }, [assistant.defaultModels, assistant.id, assistant.enableDefaultModelMentions])
 
   useEffect(() => {
     if (manualMentionUpdateRef.current) {
       return
     }
-    const defaults = assistant.defaultModels ?? []
+    const defaults = assistant.enableDefaultModelMentions !== false ? (assistant.defaultModels ?? []) : []
     if (!areModelListsEqual(defaults, mentionedModelsRef.current)) {
       delete _mentionedModelsCache[assistant.id]
       manualMentionUpdateRef.current = false
       setMentionedModelsState(defaults)
     }
-  }, [assistant.defaultModels, assistant.id])
+  }, [assistant.defaultModels, assistant.id, assistant.enableDefaultModelMentions])
 
   useEffect(() => {
     if (manualMentionUpdateRef.current) {
@@ -510,7 +513,8 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
     // Clear mentioned models cache and reset to defaults
     delete _mentionedModelsCache[assistant.id]
     manualMentionUpdateRef.current = false
-    setMentionedModelsState(assistant.defaultModels ?? [])
+    const defaultModels = assistant.enableDefaultModelMentions !== false ? (assistant.defaultModels ?? []) : []
+    setMentionedModelsState(defaultModels)
 
     addTopic(topic)
     setActiveTopic(topic)
@@ -520,6 +524,7 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
     addTopic,
     assistant.defaultModel,
     assistant.defaultModels,
+    assistant.enableDefaultModelMentions,
     assistant.id,
     setActiveTopic,
     setModel,

@@ -39,6 +39,9 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
     assistant?.settings?.customParameters ?? []
   )
   const [enableTemperature, setEnableTemperature] = useState(assistant?.settings?.enableTemperature ?? true)
+  const [enableDefaultModelMentions, setEnableDefaultModelMentions] = useState(
+    assistant?.enableDefaultModelMentions ?? true
+  )
   const isAgentPreset = assistant.type === 'agent'
   const defaultModels = assistant.defaultModels ?? []
 
@@ -247,6 +250,13 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
         <>
           <HStack alignItems="center" justifyContent="space-between" style={{ marginBottom: 10 }}>
             <Label>{t('assistants.settings.default_models.label')}</Label>
+            <Switch
+              checked={enableDefaultModelMentions}
+              onChange={(checked) => {
+                setEnableDefaultModelMentions(checked)
+                updateAssistant({ ...assistant, enableDefaultModelMentions: checked })
+              }}
+            />
           </HStack>
           <HStack alignItems="center" gap={5} style={{ flexWrap: 'wrap', marginBottom: 10 }}>
             {defaultModels.map((model) => {
