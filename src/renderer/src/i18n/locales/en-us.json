@@ -296,7 +296,7 @@
       "select_topics": "Select Topics",
       "success": "Successful",
       "summary": "Move {{count}} topic(s) to {{destination}}",
-      "title": "[to be translated]:批量移動主題"
+      "title": "Batch Move Topics"
     },
     "presets": {
       "add": {
