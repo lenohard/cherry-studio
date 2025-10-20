@@ -13,6 +13,7 @@ import {
   addAssistant,
   addTopic,
   insertAssistant,
+  moveMultipleTopics as moveMultipleTopicsAction,
   removeAllTopics,
   removeAssistant,
   removeTopic,
@@ -164,6 +165,33 @@ export function useAssistant(id: string) {
             }))
           }
         })
+    },
+    moveMultipleTopics: async (topicIds: string[], toAssistant: Assistant) => {
+      // Dispatch Redux action to update store
+      dispatch(
+        moveMultipleTopicsAction({
+          fromAssistantId: assistant.id,
+          toAssistantId: toAssistant.id,
+          topicIds
+        })
+      )
+
+      // Update topic messages in database for all moved topics
+      await Promise.all(
+        topicIds.map((topicId) =>
+          db.topics
+            .where('id')
+            .equals(topicId)
+            .modify((dbTopic) => {
+              if (dbTopic.messages) {
+                dbTopic.messages = dbTopic.messages.map((message) => ({
+                  ...message,
+                  assistantId: toAssistant.id
+                }))
+              }
+            })
+        )
+      )
     },
     updateTopic: (topic: Topic) => dispatch(updateTopic({ assistantId: assistant.id, topic })),
     updateTopics: (topics: Topic[]) => dispatch(updateTopics({ assistantId: assistant.id, topics })),
