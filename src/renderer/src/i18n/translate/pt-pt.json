@@ -4252,7 +4252,8 @@
         "none": "Não Usar Proxy",
         "system": "Proxy do Sistema",
         "title": "Modo de Proxy"
-      }
+      },
+      "tip": "[to be translated]:支持模糊匹配(*.test.com,192.168.0.0/16)"
     },
     "quickAssistant": {
       "click_tray_to_show": "Clique no ícone da bandeja para iniciar",
