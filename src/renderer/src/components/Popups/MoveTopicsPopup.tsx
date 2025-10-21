@@ -53,14 +53,9 @@ const MoveTopicsPopup: FC<MoveTopicsPopupProps> = ({ sourceAssistant, onClose, o
 
     setIsMoving(true)
     try {
-      const result = await moveMultipleTopics(selectedTopicIds, destinationAssistant)
-      if (result) {
-        onMoveComplete()
-        onClose()
-      } else {
-        logger.error('Failed to move topics: moveMultipleTopics returned falsy result')
-        window.toast.error(t('assistants.move_topics.error'))
-      }
+      await moveMultipleTopics(selectedTopicIds, destinationAssistant)
+      onMoveComplete()
+      onClose()
     } catch (error) {
       logger.error('Failed to move topics', error as Error)
       window.toast.error(t('assistants.move_topics.error'))
