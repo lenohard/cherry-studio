@@ -51,6 +51,26 @@ const buildWildcardRegex = (pattern: string): RegExp => {
   return new RegExp(`^${escapedSegments.join('.*')}$`, 'i')
 }
 
+const parseCidr = (value: string): [ipaddr.IPv4 | ipaddr.IPv6, number] | null => {
+  try {
+    return ipaddr.parseCIDR(value)
+  } catch {
+    return null
+  }
+}
+
+const isIpWithinCidr = (host: ipaddr.IPv4 | ipaddr.IPv6, cidr: [ipaddr.IPv4 | ipaddr.IPv6, number]): boolean => {
+  const [network, prefixLength] = cidr
+  const hostKind = host.kind()
+  const networkKind = network.kind()
+  if (hostKind !== networkKind) {
+    return false
+  }
+  return hostKind === 'ipv4'
+    ? (host as ipaddr.IPv4).match([network as ipaddr.IPv4, prefixLength])
+    : (host as ipaddr.IPv6).match([network as ipaddr.IPv6, prefixLength])
+}
+
 const isWildcardIp = (value: string): boolean => {
   if (!value.includes('*')) {
     return false
@@ -104,13 +124,14 @@ const parseProxyBypassRule = (rule: string): ParsedProxyBypassRule | null => {
   // CIDR notation must be processed before port extraction
   if (workingRule.includes('/')) {
     const cleanedCidr = workingRule.replace(/^\[|\]$/g, '')
-    if (ipaddr.isValidCIDR(cleanedCidr)) {
+    const parsedCidr = parseCidr(cleanedCidr)
+    if (parsedCidr) {
       return {
         type: ProxyBypassRuleType.Cidr,
         matchType: 'exact',
         rule: workingRule,
         scheme,
-        cidr: ipaddr.parseCIDR(cleanedCidr)
+        cidr: parsedCidr
       }
     }
   }
@@ -277,9 +298,7 @@ export const isByPass = (url: string) => {
         case ProxyBypassRuleType.Cidr:
           if (hostnameIsIp && rule.cidr) {
             const parsedHost = ipaddr.parse(cleanedHostname)
-            const [cidrAddress, prefixLength] = rule.cidr
-            // Ensure IP version matches before comparing
-            if (parsedHost.kind() === cidrAddress.kind() && parsedHost.match([cidrAddress, prefixLength])) {
+            if (isIpWithinCidr(parsedHost, rule.cidr)) {
               return true
             }
           }
