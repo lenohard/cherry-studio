@@ -3,7 +3,7 @@ import { DynamicVirtualList } from '@renderer/components/VirtualList'
 import { useAgent } from '@renderer/hooks/agents/useAgent'
 import { useSessions } from '@renderer/hooks/agents/useSessions'
 import { useRuntime } from '@renderer/hooks/useRuntime'
-import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
+import { useCreateAgentSession } from '@renderer/hooks/agents/useCreateAgentSession'
 import { useAppDispatch } from '@renderer/store'
 import { newMessagesActions } from '@renderer/store/newMessage'
 import {
@@ -11,7 +11,6 @@ import {
   setActiveTopicOrSessionAction,
   setSessionWaitingAction
 } from '@renderer/store/runtime'
-import { CreateSessionForm } from '@renderer/types'
 import { buildAgentSessionTopicId } from '@renderer/utils/agentSession'
 import { motion } from 'framer-motion'
 import { memo, useCallback, useEffect } from 'react'
@@ -33,6 +32,7 @@ const Sessions: React.FC<SessionsProps> = ({ agentId }) => {
   const { chat } = useRuntime()
   const { activeSessionIdMap } = chat
   const dispatch = useAppDispatch()
+  const handleCreateSession = useCreateAgentSession(agentId, agent, createSession)
 
   const setActiveSessionId = useCallback(
     (agentId: string, sessionId: string | null) => {
@@ -41,26 +41,6 @@ const Sessions: React.FC<SessionsProps> = ({ agentId }) => {
     },
     [dispatch]
   )
-
-  const handleCreateSession = useCallback(async () => {
-    if (!agent) return
-    const session = {
-      ...agent,
-      id: undefined,
-      name: t('common.unnamed')
-    } satisfies CreateSessionForm
-    const created = await createSession(session)
-    if (created) {
-      dispatch(setActiveSessionIdAction({ agentId, sessionId: created.id }))
-    }
-  }, [agent, agentId, createSession, dispatch, t])
-
-  useEffect(() => {
-    const unsubscribe = EventEmitter.on(EVENT_NAMES.ADD_NEW_SESSION, handleCreateSession)
-    return () => {
-      unsubscribe()
-    }
-  }, [handleCreateSession])
 
   const handleDeleteSession = useCallback(
     async (id: string) => {
