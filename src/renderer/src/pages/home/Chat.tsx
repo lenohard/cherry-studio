@@ -90,6 +90,21 @@ const Chat: FC<Props> = (props) => {
     }
   })
 
+  useShortcut(
+    'new_topic',
+    () => {
+      if (activeTopicOrSession !== 'session' || !activeAgentId) {
+        return
+      }
+      EventEmitter.emit(EVENT_NAMES.ADD_NEW_SESSION)
+    },
+    {
+      enabled: activeTopicOrSession === 'session',
+      preventDefault: true,
+      enableOnFormTags: true
+    }
+  )
+
   const contentSearchFilter: NodeFilter = {
     acceptNode(node) {
       const container = node.parentElement?.closest('.message-content-container')

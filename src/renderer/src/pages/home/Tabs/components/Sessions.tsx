@@ -3,6 +3,7 @@ import { DynamicVirtualList } from '@renderer/components/VirtualList'
 import { useAgent } from '@renderer/hooks/agents/useAgent'
 import { useSessions } from '@renderer/hooks/agents/useSessions'
 import { useRuntime } from '@renderer/hooks/useRuntime'
+import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { useAppDispatch } from '@renderer/store'
 import { newMessagesActions } from '@renderer/store/newMessage'
 import {
@@ -53,6 +54,13 @@ const Sessions: React.FC<SessionsProps> = ({ agentId }) => {
       dispatch(setActiveSessionIdAction({ agentId, sessionId: created.id }))
     }
   }, [agent, agentId, createSession, dispatch, t])
+
+  useEffect(() => {
+    const unsubscribe = EventEmitter.on(EVENT_NAMES.ADD_NEW_SESSION, handleCreateSession)
+    return () => {
+      unsubscribe()
+    }
+  }, [handleCreateSession])
 
   const handleDeleteSession = useCallback(
     async (id: string) => {
