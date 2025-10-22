@@ -5,9 +5,7 @@ import { HStack } from '@renderer/components/Layout'
 import MultiSelectActionPopup from '@renderer/components/Popups/MultiSelectionPopup'
 import PromptPopup from '@renderer/components/Popups/PromptPopup'
 import { QuickPanelProvider } from '@renderer/components/QuickPanel'
-import { useAgent } from '@renderer/hooks/agents/useAgent'
-import { useCreateAgentSession } from '@renderer/hooks/agents/useCreateAgentSession'
-import { useSessions } from '@renderer/hooks/agents/useSessions'
+import { useCreateDefaultSession } from '@renderer/hooks/agents/useCreateDefaultSession'
 import { useAssistant } from '@renderer/hooks/useAssistant'
 import { useChatContext } from '@renderer/hooks/useChatContext'
 import { useRuntime } from '@renderer/hooks/useRuntime'
@@ -56,9 +54,7 @@ const Chat: FC<Props> = (props) => {
   const activeSessionId = activeAgentId ? activeSessionIdMap[activeAgentId] : null
   const { apiServer } = useSettings()
   const sessionAgentId = activeTopicOrSession === 'session' ? activeAgentId : null
-  const { agent } = useAgent(sessionAgentId)
-  const { createSession } = useSessions(sessionAgentId)
-  const createAgentSession = useCreateAgentSession(sessionAgentId, agent, createSession)
+  const createDefaultSession = useCreateDefaultSession(sessionAgentId)
 
   const mainRef = React.useRef<HTMLDivElement>(null)
   const contentSearchRef = React.useRef<ContentSearchRef>(null)
@@ -103,7 +99,7 @@ const Chat: FC<Props> = (props) => {
       if (activeTopicOrSession !== 'session' || !activeAgentId) {
         return
       }
-      void createAgentSession()
+      void createDefaultSession()
     },
     {
       enabled: activeTopicOrSession === 'session',

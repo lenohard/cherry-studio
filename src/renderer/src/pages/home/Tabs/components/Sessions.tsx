@@ -1,9 +1,8 @@
 import { Alert, Spinner } from '@heroui/react'
 import { DynamicVirtualList } from '@renderer/components/VirtualList'
-import { useAgent } from '@renderer/hooks/agents/useAgent'
+import { useCreateDefaultSession } from '@renderer/hooks/agents/useCreateDefaultSession'
 import { useSessions } from '@renderer/hooks/agents/useSessions'
 import { useRuntime } from '@renderer/hooks/useRuntime'
-import { useCreateAgentSession } from '@renderer/hooks/agents/useCreateAgentSession'
 import { useAppDispatch } from '@renderer/store'
 import { newMessagesActions } from '@renderer/store/newMessage'
 import {
@@ -27,12 +26,11 @@ interface SessionsProps {
 
 const Sessions: React.FC<SessionsProps> = ({ agentId }) => {
   const { t } = useTranslation()
-  const { agent } = useAgent(agentId)
-  const { sessions, isLoading, error, deleteSession, createSession } = useSessions(agentId)
+  const { sessions, isLoading, error, deleteSession } = useSessions(agentId)
   const { chat } = useRuntime()
   const { activeSessionIdMap } = chat
   const dispatch = useAppDispatch()
-  const handleCreateSession = useCreateAgentSession(agentId, agent, createSession)
+  const handleCreateSession = useCreateDefaultSession(agentId)
 
   const setActiveSessionId = useCallback(
     (agentId: string, sessionId: string | null) => {

@@ -1,24 +1,22 @@
+import { useAgent } from '@renderer/hooks/agents/useAgent'
+import { useSessions } from '@renderer/hooks/agents/useSessions'
 import { useAppDispatch } from '@renderer/store'
 import { setActiveSessionIdAction, setActiveTopicOrSessionAction } from '@renderer/store/runtime'
-import type { CreateAgentSessionResponse, CreateSessionForm, GetAgentResponse } from '@renderer/types'
+import type { CreateSessionForm } from '@renderer/types'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
-type CreateSessionFn = (form: CreateSessionForm) => Promise<CreateAgentSessionResponse | null>
-
 /**
- * Returns a stable callback that creates a new agent session and updates UI state.
+ * Returns a stable callback that creates a default agent session and updates UI state.
  */
-export const useCreateAgentSession = (
-  agentId: string | null,
-  agent: GetAgentResponse | undefined,
-  createSession?: CreateSessionFn
-) => {
+export const useCreateDefaultSession = (agentId: string | null) => {
+  const { agent } = useAgent(agentId)
+  const { createSession } = useSessions(agentId)
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
 
   return useCallback(async () => {
-    if (!agentId || !agent || !createSession) {
+    if (!agentId || !agent) {
       return null
     }
 
