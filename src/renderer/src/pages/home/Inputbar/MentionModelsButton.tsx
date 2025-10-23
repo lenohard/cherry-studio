@@ -33,6 +33,8 @@ interface Props {
   couldMentionNotVisionModel: boolean
   files: FileType[]
   setText: React.Dispatch<React.SetStateAction<string>>
+  isDefaultMentionsEnabled: boolean
+  onToggleDefaultMentions: () => void
 }
 
 const MentionModelsButton: FC<Props> = ({
@@ -43,7 +45,9 @@ const MentionModelsButton: FC<Props> = ({
   onClearMentionModels,
   couldMentionNotVisionModel,
   files,
-  setText
+  setText,
+  isDefaultMentionsEnabled,
+  onToggleDefaultMentions
 }) => {
   const { providers } = useProviders()
   const { t } = useTranslation()
@@ -300,14 +304,6 @@ const MentionModelsButton: FC<Props> = ({
     [modelItems, quickPanel, t, setText, removeAtSymbolAndText]
   )
 
-  const handleOpenQuickPanel = useCallback(() => {
-    if (quickPanel.isVisible && quickPanel.symbol === QuickPanelReservedSymbol.MentionModels) {
-      quickPanel.close()
-    } else {
-      openQuickPanel({ type: 'button' })
-    }
-  }, [openQuickPanel, quickPanel])
-
   const filesRef = useRef(files)
 
   useEffect(() => {
@@ -333,8 +329,16 @@ const MentionModelsButton: FC<Props> = ({
   }))
 
   return (
-    <Tooltip placement="top" title={t('assistants.presets.edit.model.select.title')} mouseLeaveDelay={0} arrow>
-      <ActionIconButton onClick={handleOpenQuickPanel} active={mentionedModels.length > 0}>
+    <Tooltip
+      placement="top"
+      title={
+        isDefaultMentionsEnabled
+          ? t('assistants.settings.default_models.enabled')
+          : t('assistants.settings.default_models.disabled')
+      }
+      mouseLeaveDelay={0}
+      arrow>
+      <ActionIconButton onClick={onToggleDefaultMentions} active={isDefaultMentionsEnabled}>
         <AtSign size={18} />
       </ActionIconButton>
     </Tooltip>

@@ -81,6 +81,8 @@ interface Props {
 let _text = ''
 let _files: FileType[] = []
 const _mentionedModelsCache: Record<string, Model[] | undefined> = {}
+// Cache for per-topic default mentions toggle state: `assistantId-topicId` -> boolean
+const _defaultMentionsToggleCache: Record<string, boolean | undefined> = {}
 
 const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) => {
   const [text, setText] = useState(_text)
@@ -125,6 +127,11 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
     [setMentionedModelsState]
   )
   const mentionedModelsRef = useRef(mentionedModels)
+  // Per-topic toggle state for default mentions
+  const [isDefaultMentionsEnabled, setIsDefaultMentionsEnabledState] = useState<boolean>(
+    assistant.enableDefaultModelMentions !== false
+  )
+  const defaultMentionsToggleRef = useRef(isDefaultMentionsEnabled)
   const [isDragging, setIsDragging] = useState(false)
   const [isFileDragging, setIsFileDragging] = useState(false)
   const [textareaHeight, setTextareaHeight] = useState<number>()
@@ -138,6 +145,31 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
   useEffect(() => {
     mentionedModelsRef.current = mentionedModels
   }, [mentionedModels])
+
+  useEffect(() => {
+    defaultMentionsToggleRef.current = isDefaultMentionsEnabled
+  }, [isDefaultMentionsEnabled])
+
+  // Initialize toggle state for the current topic
+  useEffect(() => {
+    const cacheKey = `${assistant.id}-${topic.id}`
+    const cached = _defaultMentionsToggleCache[cacheKey]
+
+    if (cached !== undefined) {
+      setIsDefaultMentionsEnabledState(cached)
+    } else {
+      // Default to assistant config setting
+      setIsDefaultMentionsEnabledState(assistant.enableDefaultModelMentions !== false)
+    }
+  }, [topic.id, assistant.id, assistant.enableDefaultModelMentions])
+
+  // Save toggle state to cache when topic changes
+  useEffect(() => {
+    return () => {
+      const cacheKey = `${assistant.id}-${topic.id}`
+      _defaultMentionsToggleCache[cacheKey] = defaultMentionsToggleRef.current
+    }
+  }, [assistant.id, topic.id])
 
   const isVisionSupported = useMemo(
     () =>
@@ -516,6 +548,11 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
     const defaultModels = assistant.enableDefaultModelMentions !== false ? (assistant.defaultModels ?? []) : []
     setMentionedModelsState(defaultModels)
 
+    // Reset toggle state for new topic
+    const newTopicCacheKey = `${assistant.id}-${topic.id}`
+    delete _defaultMentionsToggleCache[newTopicCacheKey]
+    setIsDefaultMentionsEnabledState(assistant.enableDefaultModelMentions !== false)
+
     addTopic(topic)
     setActiveTopic(topic)
 
@@ -564,6 +601,22 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
     }
     EventEmitter.emit(EVENT_NAMES.NEW_CONTEXT)
   }
+
+  const toggleDefaultMentions = useCallback(() => {
+    setIsDefaultMentionsEnabledState((prev) => {
+      const newValue = !prev
+      if (newValue) {
+        // Enable: restore default models
+        manualMentionUpdateRef.current = false
+        const defaultModels = assistant.defaultModels ?? []
+        setMentionedModelsState(defaultModels)
+      } else {
+        // Disable: clear mentioned models
+        setMentionedModelsState([])
+      }
+      return newValue
+    })
+  }, [assistant.defaultModels])
 
   const onInput = () => !expanded && resizeTextArea()
 
@@ -1016,6 +1069,8 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
               addNewTopic={addNewTopic}
               clearTopic={clearTopic}
               onNewContext={onNewContext}
+              isDefaultMentionsEnabled={isDefaultMentionsEnabled}
+              onToggleDefaultMentions={toggleDefaultMentions}
             />
             <ToolbarMenu>
               <TokenCount
