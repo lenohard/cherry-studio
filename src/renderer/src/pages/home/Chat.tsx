@@ -54,7 +54,7 @@ const Chat: FC<Props> = (props) => {
   const activeSessionId = activeAgentId ? activeSessionIdMap[activeAgentId] : null
   const { apiServer } = useSettings()
   const sessionAgentId = activeTopicOrSession === 'session' ? activeAgentId : null
-  const createDefaultSession = useCreateDefaultSession(sessionAgentId)
+  const { createDefaultSession } = useCreateDefaultSession(sessionAgentId)
 
   const mainRef = React.useRef<HTMLDivElement>(null)
   const contentSearchRef = React.useRef<ContentSearchRef>(null)

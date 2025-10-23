@@ -48,7 +48,7 @@ const AgentSessionInputbar: FC<Props> = ({ agentId, sessionId }) => {
   const { session } = useSession(agentId, sessionId)
   const { agent } = useAgent(agentId)
   const { apiServer } = useSettings()
-  const createDefaultSession = useCreateDefaultSession(agentId)
+  const { createDefaultSession, creatingSession } = useCreateDefaultSession(agentId)
   const newTopicShortcut = useShortcutDisplay('new_topic')
 
   const { sendMessageShortcut, fontSize, enableSpellCheck } = useSettings()
@@ -91,7 +91,6 @@ const AgentSessionInputbar: FC<Props> = ({ agentId, sessionId }) => {
   }, [topicMessages])
 
   const canAbort = loading && streamingAskIds.length > 0
-  const [creatingSession, setCreatingSession] = useState(false)
   const createSessionDisabled = creatingSession || !apiServer.enabled
 
   const handleCreateSession = useCallback(async () => {
@@ -99,11 +98,6 @@ const AgentSessionInputbar: FC<Props> = ({ agentId, sessionId }) => {
       return
     }
 
-    if (!createDefaultSession) {
-      return
-    }
-
-    setCreatingSession(true)
     try {
       const created = await createDefaultSession()
       if (created) {
@@ -111,10 +105,8 @@ const AgentSessionInputbar: FC<Props> = ({ agentId, sessionId }) => {
       }
     } catch (error) {
       logger.warn('Failed to create agent session via toolbar:', error as Error)
-    } finally {
-      setCreatingSession(false)
     }
-  }, [createSessionDisabled, createDefaultSession, focusTextarea])
+  }, [createDefaultSession, createSessionDisabled, focusTextarea])
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     //to check if the SendMessage key is pressed
@@ -317,7 +309,10 @@ const AgentSessionInputbar: FC<Props> = ({ agentId, sessionId }) => {
           <Toolbar>
             <ToolbarGroup>
               <Tooltip placement="top" content={t('chat.input.new_topic', { Command: newTopicShortcut })} delay={0}>
-                <ActionIconButton onClick={handleCreateSession} disabled={createSessionDisabled} loading={creatingSession}>
+                <ActionIconButton
+                  onClick={handleCreateSession}
+                  disabled={createSessionDisabled}
+                  loading={creatingSession}>
                   <MessageSquareDiff size={19} />
                 </ActionIconButton>
               </Tooltip>

@@ -30,7 +30,7 @@ const Sessions: React.FC<SessionsProps> = ({ agentId }) => {
   const { chat } = useRuntime()
   const { activeSessionIdMap } = chat
   const dispatch = useAppDispatch()
-  const handleCreateSession = useCreateDefaultSession(agentId)
+  const { createDefaultSession, creatingSession } = useCreateDefaultSession(agentId)
 
   const setActiveSessionId = useCallback(
     (agentId: string, sessionId: string | null) => {
@@ -96,7 +96,7 @@ const Sessions: React.FC<SessionsProps> = ({ agentId }) => {
 
   return (
     <div className="sessions-tab flex h-full w-full flex-col p-2">
-      <AddButton onPress={handleCreateSession} className="mb-2">
+      <AddButton onPress={createDefaultSession} className="mb-2" isDisabled={creatingSession}>
         {t('agent.session.add.title')}
       </AddButton>
       {/* h-9 */}
