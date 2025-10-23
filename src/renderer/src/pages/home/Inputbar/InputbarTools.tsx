@@ -82,6 +82,8 @@ export interface InputbarToolsProps {
   addNewTopic: () => void
   clearTopic: () => void
   onNewContext: () => void
+  isDefaultMentionsEnabled: boolean
+  onToggleDefaultMentions: () => void
 }
 
 interface ToolButtonConfig {
@@ -115,6 +117,8 @@ const InputbarTools = ({
   addNewTopic,
   clearTopic,
   onNewContext,
+  isDefaultMentionsEnabled,
+  onToggleDefaultMentions,
   extensions
 }: InputbarToolsProps & { ref?: React.RefObject<InputbarToolsRef | null> }) => {
   const { t } = useTranslation()
@@ -432,6 +436,8 @@ const InputbarTools = ({
             couldMentionNotVisionModel={couldMentionNotVisionModel}
             files={files}
             setText={setText}
+            isDefaultMentionsEnabled={isDefaultMentionsEnabled}
+            onToggleDefaultMentions={onToggleDefaultMentions}
           />
         )
       },
@@ -494,6 +500,7 @@ const InputbarTools = ({
     files,
     handleKnowledgeBaseSelect,
     isExpended,
+    isDefaultMentionsEnabled,
     mentionedModels,
     model,
     newTopicShortcut,
@@ -501,6 +508,7 @@ const InputbarTools = ({
     onEnableGenerateImage,
     onMentionModel,
     onNewContext,
+    onToggleDefaultMentions,
     onToggleExpended,
     resizeTextArea,
     selectedKnowledgeBases,
