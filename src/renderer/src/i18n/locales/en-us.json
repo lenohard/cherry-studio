@@ -483,8 +483,10 @@
       "add_model": "Add Model",
       "default_model": "Default Model",
       "default_models": {
+        "disabled": "Default mentions disabled",
         "duplicate": "This model is already in the default list",
         "enableMentions": "Enable Default Mentions",
+        "enabled": "Default mentions enabled",
         "label": "Default Models",
         "save": "Save as Default",
         "saveDescription": "Save current model selection as default for this assistant",
