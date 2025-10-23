@@ -3,7 +3,7 @@ import { useSessions } from '@renderer/hooks/agents/useSessions'
 import { useAppDispatch } from '@renderer/store'
 import { setActiveSessionIdAction, setActiveTopicOrSessionAction } from '@renderer/store/runtime'
 import type { CreateSessionForm } from '@renderer/types'
-import { useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 /**
@@ -14,25 +14,39 @@ export const useCreateDefaultSession = (agentId: string | null) => {
   const { createSession } = useSessions(agentId)
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
+  const [creatingSession, setCreatingSession] = useState(false)
 
-  return useCallback(async () => {
-    if (!agentId || !agent) {
+  const createDefaultSession = useCallback(async () => {
+    if (!agentId || !agent || creatingSession) {
       return null
     }
 
-    const session = {
-      ...agent,
-      id: undefined,
-      name: t('common.unnamed')
-    } satisfies CreateSessionForm
+    setCreatingSession(true)
+    try {
+      const session = {
+        ...agent,
+        id: undefined,
+        name: t('common.unnamed')
+      } satisfies CreateSessionForm
 
-    const created = await createSession(session)
+      const created = await createSession(session)
 
-    if (created) {
-      dispatch(setActiveSessionIdAction({ agentId, sessionId: created.id }))
-      dispatch(setActiveTopicOrSessionAction('session'))
+      if (created) {
+        dispatch(setActiveSessionIdAction({ agentId, sessionId: created.id }))
+        dispatch(setActiveTopicOrSessionAction('session'))
+      }
+
+      return created
+    } finally {
+      setCreatingSession(false)
     }
+  }, [agentId, agent, createSession, creatingSession, dispatch, t])
 
-    return created
-  }, [agentId, agent, createSession, dispatch, t])
+  return useMemo(
+    () => ({
+      createDefaultSession,
+      creatingSession
+    }),
+    [createDefaultSession, creatingSession]
+  )
 }
