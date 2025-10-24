@@ -3,7 +3,7 @@ import { useSessions } from '@renderer/hooks/agents/useSessions'
 import { useAppDispatch } from '@renderer/store'
 import { setActiveSessionIdAction, setActiveTopicOrSessionAction } from '@renderer/store/runtime'
 import type { CreateSessionForm } from '@renderer/types'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 /**
@@ -42,11 +42,8 @@ export const useCreateDefaultSession = (agentId: string | null) => {
     }
   }, [agentId, agent, createSession, creatingSession, dispatch, t])
 
-  return useMemo(
-    () => ({
-      createDefaultSession,
-      creatingSession
-    }),
-    [createDefaultSession, creatingSession]
-  )
+  return {
+    createDefaultSession,
+    creatingSession
+  }
 }
