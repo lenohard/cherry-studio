@@ -171,6 +171,12 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
     }
   }, [assistant.id, topic.id])
 
+  useEffect(() => {
+    Object.keys(_defaultMentionsToggleCache).forEach((key) => {
+      delete _defaultMentionsToggleCache[key]
+    })
+  }, [assistant.enableDefaultModelMentions])
+
   const isVisionSupported = useMemo(
     () =>
       (mentionedModels.length > 0 && isVisionModels(mentionedModels)) ||
@@ -558,18 +564,23 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
   const toggleDefaultMentions = useCallback(() => {
     setIsDefaultMentionsEnabledState((prev) => {
       const newValue = !prev
+
       if (newValue) {
-        // Enable: restore default models
+        // Enable: restore default models and sync assistant setting
         manualMentionUpdateRef.current = false
         const defaultModels = assistant.defaultModels ?? []
         setMentionedModelsState(defaultModels)
       } else {
         // Disable: clear mentioned models
+        manualMentionUpdateRef.current = false
         setMentionedModelsState([])
       }
+
+      updateAssistant({ enableDefaultModelMentions: newValue })
+
       return newValue
     })
-  }, [assistant.defaultModels])
+  }, [assistant.defaultModels, updateAssistant])
 
   const onInput = () => !expanded && resizeTextArea()
 
