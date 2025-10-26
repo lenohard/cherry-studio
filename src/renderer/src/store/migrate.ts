@@ -2752,6 +2752,8 @@ const migrateConfig = {
 
       // Update text delta for defaultModels on default assistant
       state.assistants.defaultAssistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
+
+      return state
     } catch (error) {
       logger.error('migrate 167 error', error as Error)
       return state
