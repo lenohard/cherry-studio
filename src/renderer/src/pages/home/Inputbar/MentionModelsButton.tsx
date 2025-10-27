@@ -13,7 +13,7 @@ import { Avatar, Tooltip } from 'antd'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { first, sortBy } from 'lodash'
 import { AtSign, CircleX, Plus, Save } from 'lucide-react'
-import { FC, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react'
+import { FC, memo, MouseEvent, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import styled from 'styled-components'
@@ -328,6 +328,20 @@ const MentionModelsButton: FC<Props> = ({
     openQuickPanel
   }))
 
+  const handleButtonClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      if (event.metaKey || event.ctrlKey) {
+        event.preventDefault()
+        event.stopPropagation()
+        onToggleDefaultMentions()
+        return
+      }
+
+      openQuickPanel({ type: 'button' })
+    },
+    [onToggleDefaultMentions, openQuickPanel]
+  )
+
   return (
     <Tooltip
       placement="top"
@@ -338,7 +352,7 @@ const MentionModelsButton: FC<Props> = ({
       }
       mouseLeaveDelay={0}
       arrow>
-      <ActionIconButton onClick={onToggleDefaultMentions} active={isDefaultMentionsEnabled}>
+      <ActionIconButton onClick={handleButtonClick} active={isDefaultMentionsEnabled}>
         <AtSign size={18} />
       </ActionIconButton>
     </Tooltip>
