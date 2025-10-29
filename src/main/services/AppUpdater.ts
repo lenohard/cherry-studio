@@ -74,10 +74,15 @@ export default class AppUpdater {
   }
 
   private async _getReleaseVersionFromGithub(channel: UpgradeChannel) {
-    const headers = {
+    const githubToken = process.env.GH_TOKEN || process.env.GITHUB_TOKEN
+    const headers: Record<string, string> = {
       Accept: 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
       'Accept-Language': 'en-US,en;q=0.9'
+    }
+    if (githubToken) {
+      headers.Authorization = `Bearer ${githubToken}`
+      logger.info('using github token for release lookup')
     }
     try {
       logger.info(`get release version from github: ${channel}`)
