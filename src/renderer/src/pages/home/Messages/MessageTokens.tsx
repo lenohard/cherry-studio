@@ -7,7 +7,6 @@ import styled from 'styled-components'
 
 interface MessageTokensProps {
   message: Message
-  isLastMessage?: boolean
 }
 
 const MessageTokens: React.FC<MessageTokensProps> = ({ message }) => {
@@ -106,7 +105,10 @@ const MessageMetadata = styled.div`
   color: var(--color-text-3);
   user-select: text;
   cursor: pointer;
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  align-self: stretch;
 
   .tokens span {
     padding: 0 2px;

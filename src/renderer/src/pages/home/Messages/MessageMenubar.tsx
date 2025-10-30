@@ -522,8 +522,10 @@ const MessageMenubar: FC<Props> = (props) => {
   }, [message])
 
   const softHoverBg = isBubbleStyle && !isLastMessage
-  const showMessageTokens = !isBubbleStyle
   const isUserBubbleStyleMessage = isBubbleStyle && isUserMessage
+  const bubbleAlignment: 'flex-start' | 'flex-end' = isAssistantMessage ? 'flex-start' : 'flex-end'
+
+  const tokensElement = <MessageTokens message={message} />
 
   const buttonContext: MessageMenubarButtonContext = {
     assistant,
@@ -558,9 +560,36 @@ const MessageMenubar: FC<Props> = (props) => {
     translateLanguages
   }
 
+  if (isBubbleStyle) {
+    return (
+      <BubbleMenubarWrapper $align={bubbleAlignment}>
+        {tokensElement}
+        <MenusBar
+          className={classNames({
+            menubar: true,
+            show: isLastMessage,
+            'user-bubble-style': isUserBubbleStyleMessage
+          })}>
+          {buttonIds.map((buttonId) => {
+            const renderFn = buttonRenderers[buttonId]
+            if (!renderFn) {
+              logger.warn(`No renderer registered for MessageMenubar button id: ${buttonId}`)
+              return null
+            }
+            const element = renderFn(buttonContext)
+            if (!element) {
+              return null
+            }
+            return <Fragment key={buttonId}>{element}</Fragment>
+          })}
+        </MenusBar>
+      </BubbleMenubarWrapper>
+    )
+  }
+
   return (
     <>
-      {showMessageTokens && <MessageTokens message={message} />}
+      {tokensElement}
       <MenusBar
         className={classNames({ menubar: true, show: isLastMessage, 'user-bubble-style': isUserBubbleStyleMessage })}>
         {buttonIds.map((buttonId) => {
@@ -579,6 +608,14 @@ const MessageMenubar: FC<Props> = (props) => {
     </>
   )
 }
+
+const BubbleMenubarWrapper = styled.div<{ $align: 'flex-start' | 'flex-end' }>`
+  display: flex;
+  flex-direction: column;
+  align-items: ${(props) => props.$align};
+  gap: 4px;
+  width: 100%;
+`
 
 const MenusBar = styled.div`
   display: flex;
