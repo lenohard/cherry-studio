@@ -7,9 +7,10 @@ import styled from 'styled-components'
 
 interface MessageTokensProps {
   message: Message
+  align?: 'left' | 'right'
 }
 
-const MessageTokens: React.FC<MessageTokensProps> = ({ message }) => {
+const MessageTokens: React.FC<MessageTokensProps> = ({ message, align = 'left' }) => {
   // const { generating } = useRuntime()
   const locateMessage = () => {
     EventEmitter.emit(EVENT_NAMES.LOCATE_MESSAGE + ':' + message.id, false)
@@ -55,7 +56,7 @@ const MessageTokens: React.FC<MessageTokensProps> = ({ message }) => {
 
   if (message.role === 'user') {
     return (
-      <MessageMetadata className="message-tokens" onClick={locateMessage}>
+      <MessageMetadata className="message-tokens" onClick={locateMessage} $align={align}>
         {`Tokens: ${message?.usage?.total_tokens}`}
       </MessageMetadata>
     )
@@ -85,7 +86,7 @@ const MessageTokens: React.FC<MessageTokensProps> = ({ message }) => {
     )
 
     return (
-      <MessageMetadata className="message-tokens" onClick={locateMessage}>
+      <MessageMetadata className="message-tokens" onClick={locateMessage} $align={align}>
         {hasMetrics ? (
           <Popover content={metrixs} placement="top" trigger="hover" styles={{ root: { fontSize: 11 } }}>
             {tokensInfo}
@@ -100,15 +101,17 @@ const MessageTokens: React.FC<MessageTokensProps> = ({ message }) => {
   return null
 }
 
-const MessageMetadata = styled.div`
+const MessageMetadata = styled.div<{ $align: 'left' | 'right' }>`
   font-size: 10px;
   color: var(--color-text-3);
   user-select: text;
   cursor: pointer;
   display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  align-self: stretch;
+  flex: 0 1 auto;
+  min-width: 0;
+  justify-content: ${(props) => (props.$align === 'right' ? 'flex-end' : 'flex-start')};
+  margin-left: ${(props) => (props.$align === 'right' ? 'auto' : '0')};
+  margin-right: ${(props) => (props.$align === 'left' ? 'auto' : '0')};
 
   .tokens span {
     padding: 0 2px;
