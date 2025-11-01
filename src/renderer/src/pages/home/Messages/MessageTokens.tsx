@@ -1,7 +1,7 @@
 // import { useRuntime } from '@renderer/hooks/useRuntime'
-import { classNames } from '@renderer/utils'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import type { Message } from '@renderer/types/newMessage'
+import { classNames } from '@renderer/utils'
 import { Popover } from 'antd'
 import { t } from 'i18next'
 
