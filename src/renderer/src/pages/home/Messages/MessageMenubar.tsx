@@ -527,7 +527,7 @@ const MessageMenubar: FC<Props> = (props) => {
   const softHoverBg = isBubbleStyle && !isLastMessage
   const isUserBubbleStyleMessage = isBubbleStyle && isUserMessage
   const bubbleAlignment: 'flex-start' | 'flex-end' = isAssistantMessage ? 'flex-start' : 'flex-end'
-  const messageTokensAlignment: 'left' | 'right' = isBubbleStyle ? 'right' : 'left'
+  const messageTokensAlignment: 'left' | 'right' = isBubbleStyle || isAssistantMessage ? 'right' : 'left'
 
   const tokensElement = <MessageTokens message={message} align={messageTokensAlignment} />
 
@@ -566,7 +566,11 @@ const MessageMenubar: FC<Props> = (props) => {
 
   if (isBubbleStyle) {
     return (
-      <BubbleMenubarWrapper $align={bubbleAlignment}>
+      <div
+        className={classNames(
+          'flex w-full flex-row items-center gap-2',
+          bubbleAlignment === 'flex-start' ? 'justify-start' : 'justify-end'
+        )}>
         <MenusBar
           className={classNames({
             menubar: true,
@@ -586,8 +590,8 @@ const MessageMenubar: FC<Props> = (props) => {
             return <Fragment key={buttonId}>{element}</Fragment>
           })}
         </MenusBar>
-        <BubbleTokens>{tokensElement}</BubbleTokens>
-      </BubbleMenubarWrapper>
+        <div className="ml-auto flex min-w-0 flex-none justify-end">{tokensElement}</div>
+      </div>
     )
   }
 
@@ -612,23 +616,6 @@ const MessageMenubar: FC<Props> = (props) => {
     </>
   )
 }
-
-const BubbleMenubarWrapper = styled.div<{ $align: 'flex-start' | 'flex-end' }>`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: ${(props) => props.$align};
-  gap: 8px;
-  width: 100%;
-`
-
-const BubbleTokens = styled.div`
-  margin-left: auto;
-  flex: 0 0 auto;
-  min-width: 0;
-  display: flex;
-  justify-content: flex-end;
-`
 
 const MenusBar = styled.div`
   display: flex;

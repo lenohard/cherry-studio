@@ -1,9 +1,9 @@
 // import { useRuntime } from '@renderer/hooks/useRuntime'
+import { classNames } from '@renderer/utils'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import type { Message } from '@renderer/types/newMessage'
 import { Popover } from 'antd'
 import { t } from 'i18next'
-import styled from 'styled-components'
 
 interface MessageTokensProps {
   message: Message
@@ -54,11 +54,16 @@ const MessageTokens: React.FC<MessageTokensProps> = ({ message, align = 'left' }
     return <div />
   }
 
+  const metadataClassName = classNames(
+    'message-tokens flex min-w-0 cursor-pointer select-text text-[10px] text-[var(--color-text-3)]',
+    align === 'right' ? 'ml-auto justify-end' : 'mr-auto justify-start'
+  )
+
   if (message.role === 'user') {
     return (
-      <MessageMetadata className="message-tokens" onClick={locateMessage} $align={align}>
+      <div className={metadataClassName} onClick={locateMessage}>
         {`Tokens: ${message?.usage?.total_tokens}`}
-      </MessageMetadata>
+      </div>
     )
   }
 
@@ -78,15 +83,15 @@ const MessageTokens: React.FC<MessageTokensProps> = ({ message, align = 'left' }
     const tokensInfo = (
       <span className="tokens">
         Tokens:
-        <span>{message?.usage?.total_tokens}</span>
-        <span>↑{message?.usage?.prompt_tokens}</span>
-        <span>↓{message?.usage?.completion_tokens}</span>
-        <span>{getPriceString()}</span>
+        <span className="px-0.5">{message?.usage?.total_tokens}</span>
+        <span className="px-0.5">↑{message?.usage?.prompt_tokens}</span>
+        <span className="px-0.5">↓{message?.usage?.completion_tokens}</span>
+        <span className="px-0.5">{getPriceString()}</span>
       </span>
     )
 
     return (
-      <MessageMetadata className="message-tokens" onClick={locateMessage} $align={align}>
+      <div className={metadataClassName} onClick={locateMessage}>
         {hasMetrics ? (
           <Popover content={metrixs} placement="top" trigger="hover" styles={{ root: { fontSize: 11 } }}>
             {tokensInfo}
@@ -94,28 +99,11 @@ const MessageTokens: React.FC<MessageTokensProps> = ({ message, align = 'left' }
         ) : (
           tokensInfo
         )}
-      </MessageMetadata>
+      </div>
     )
   }
 
   return null
 }
-
-const MessageMetadata = styled.div<{ $align: 'left' | 'right' }>`
-  font-size: 10px;
-  color: var(--color-text-3);
-  user-select: text;
-  cursor: pointer;
-  display: flex;
-  flex: 0 1 auto;
-  min-width: 0;
-  justify-content: ${(props) => (props.$align === 'right' ? 'flex-end' : 'flex-start')};
-  margin-left: ${(props) => (props.$align === 'right' ? 'auto' : '0')};
-  margin-right: ${(props) => (props.$align === 'left' ? 'auto' : '0')};
-
-  .tokens span {
-    padding: 0 2px;
-  }
-`
 
 export default MessageTokens
