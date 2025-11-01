@@ -1,8 +1,9 @@
 import { loggerService } from '@logger'
 import { useAssistant, useAssistants } from '@renderer/hooks/useAssistant'
-import { Assistant } from '@renderer/types'
+import type { Assistant } from '@renderer/types'
 import { Checkbox, Modal, Spin } from 'antd'
-import { FC, useCallback, useMemo, useState } from 'react'
+import type { FC } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
