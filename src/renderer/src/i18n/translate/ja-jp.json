@@ -1,6 +1,7 @@
 {
   "agent": {
     "add": {
+      "description": "さまざまなツールを使って複雑なタスクを処理する",
       "error": {
         "failed": "エージェントの追加に失敗しました",
         "invalid_agent": "無効なエージェント"
@@ -573,7 +574,11 @@
   "chat": {
     "add": {
       "assistant": {
+        "description": "日常会話と簡単なQ&A",
         "title": "アシスタントを追加"
+      },
+      "option": {
+        "title": "種類を選択"
       },
       "topic": {
         "title": "新しいトピック"
@@ -2503,6 +2508,7 @@
     "qiniu": "七牛云 AI 推理",
     "qwenlm": "QwenLM",
     "silicon": "SiliconFlow",
+    "sophnet": "SophNet",
     "stepfun": "StepFun",
     "tencent-cloud-ti": "Tencent Cloud TI",
     "together": "Together",
@@ -4280,6 +4286,12 @@
       "aws-bedrock": {
         "access_key_id": "AWS アクセスキー ID",
         "access_key_id_help": "あなたの AWS アクセスキー ID は、AWS Bedrock サービスへのアクセスに使用されます",
+        "api_key": "Bedrock APIキー",
+        "api_key_help": "認証用のAWS Bedrock APIキー",
+        "auth_type": "認証タイプ",
+        "auth_type_api_key": "Bedrock APIキー",
+        "auth_type_help": "IAM認証情報とBedrock APIキー認証のどちらかを選択してください",
+        "auth_type_iam": "IAM認証情報",
         "description": "AWS Bedrock は、Amazon が提供する完全に管理されたベースモデルサービスで、さまざまな最先端の大言語モデルをサポートしています",
         "region": "AWS リージョン",
         "region_help": "あなたの AWS サービスリージョン、例：us-east-1",

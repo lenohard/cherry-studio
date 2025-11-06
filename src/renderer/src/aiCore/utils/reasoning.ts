@@ -98,7 +98,7 @@ export function getReasoningEffort(assistant: Assistant, model: Model): Reasonin
           extra_body: {
             google: {
               thinking_config: {
-                thinkingBudget: 0
+                thinking_budget: 0
               }
             }
           }
@@ -259,8 +259,8 @@ export function getReasoningEffort(assistant: Assistant, model: Model): Reasonin
         extra_body: {
           google: {
             thinking_config: {
-              thinkingBudget: -1,
-              includeThoughts: true
+              thinking_budget: -1,
+              include_thoughts: true
             }
           }
         }
@@ -270,8 +270,8 @@ export function getReasoningEffort(assistant: Assistant, model: Model): Reasonin
       extra_body: {
         google: {
           thinking_config: {
-            thinkingBudget: budgetTokens,
-            includeThoughts: true
+            thinking_budget: budgetTokens ?? -1,
+            include_thoughts: true
           }
         }
       }
@@ -431,8 +431,8 @@ export function getGeminiReasoningParams(assistant: Assistant, model: Model): Re
     if (reasoningEffort === undefined) {
       return {
         thinkingConfig: {
-          includeThoughts: false,
-          ...(GEMINI_FLASH_MODEL_REGEX.test(model.id) ? { thinkingBudget: 0 } : {})
+          include_thoughts: false,
+          ...(GEMINI_FLASH_MODEL_REGEX.test(model.id) ? { thinking_budget: 0 } : {})
         }
       }
     }
@@ -442,7 +442,7 @@ export function getGeminiReasoningParams(assistant: Assistant, model: Model): Re
     if (effortRatio > 1) {
       return {
         thinkingConfig: {
-          includeThoughts: true
+          include_thoughts: true
         }
       }
     }
@@ -452,8 +452,8 @@ export function getGeminiReasoningParams(assistant: Assistant, model: Model): Re
 
     return {
       thinkingConfig: {
-        ...(budget > 0 ? { thinkingBudget: budget } : {}),
-        includeThoughts: true
+        ...(budget > 0 ? { thinking_budget: budget } : {}),
+        include_thoughts: true
       }
     }
   }
@@ -482,6 +482,34 @@ export function getXAIReasoningParams(assistant: Assistant, model: Model): Recor
   // For XAI provider Grok models, use reasoningEffort parameter directly
   return {
     reasoningEffort
+  }
+}
+
+/**
+ * Get Bedrock reasoning parameters
+ */
+export function getBedrockReasoningParams(assistant: Assistant, model: Model): Record<string, any> {
+  if (!isReasoningModel(model)) {
+    return {}
+  }
+
+  const reasoningEffort = assistant?.settings?.reasoning_effort
+
+  if (reasoningEffort === undefined) {
+    return {}
+  }
+
+  // Only apply thinking budget for Claude reasoning models
+  if (!isSupportedThinkingTokenClaudeModel(model)) {
+    return {}
+  }
+
+  const budgetTokens = getAnthropicThinkingBudget(assistant, model)
+  return {
+    reasoningConfig: {
+      type: 'enabled',
+      budgetTokens: budgetTokens
+    }
   }
 }
 
