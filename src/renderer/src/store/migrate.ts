@@ -2842,6 +2842,98 @@ const migrateConfig = {
       logger.error('migrate 171 error', error as Error)
       return state
     }
+  },
+  '172': (state: RootState) => {
+    try {
+      // Add ling and huggingchat mini apps
+      addMiniApp(state, 'ling')
+      addMiniApp(state, 'huggingchat')
+
+      // Add ovocr provider and clear ovms paintings
+      addOcrProvider(state, BUILTIN_OCR_PROVIDERS_MAP.ovocr)
+      if (isEmpty(state.paintings.ovms_paintings)) {
+        state.paintings.ovms_paintings = []
+      }
+
+      // Migrate agents to assistants presets
+      // @ts-ignore
+      if (state?.agents?.agents) {
+        // @ts-ignore
+        state.assistants.presets = [...state.agents.agents]
+        // @ts-ignore
+        delete state.agents.agents
+      }
+
+      // Initialize assistants presets
+      if (state.assistants.presets === undefined) {
+        state.assistants.presets = []
+      }
+
+      // Migrate assistants presets
+      state.assistants.presets.forEach((preset) => {
+        if (!preset.settings) {
+          preset.settings = DEFAULT_ASSISTANT_SETTINGS
+        } else if (!preset.settings.toolUseMode) {
+          preset.settings.toolUseMode = DEFAULT_ASSISTANT_SETTINGS.toolUseMode
+        }
+      })
+
+      // Migrate sidebar icons
+      if (state.settings.sidebarIcons) {
+        state.settings.sidebarIcons.visible = state.settings.sidebarIcons.visible.map((icon) => {
+          // @ts-ignore
+          return icon === 'agents' ? 'store' : icon
+        })
+        state.settings.sidebarIcons.disabled = state.settings.sidebarIcons.disabled.map((icon) => {
+          // @ts-ignore
+          return icon === 'agents' ? 'store' : icon
+        })
+      }
+
+      // Migrate llm providers
+      state.llm.providers.forEach((provider) => {
+        if (provider.id === SystemProviderIds['new-api'] && provider.type !== 'new-api') {
+          provider.type = 'new-api'
+        }
+
+        switch (provider.id) {
+          case 'deepseek':
+            provider.anthropicApiHost = 'https://api.deepseek.com/anthropic'
+            break
+          case 'moonshot':
+            provider.anthropicApiHost = 'https://api.moonshot.cn/anthropic'
+            break
+          case 'zhipu':
+            provider.anthropicApiHost = 'https://open.bigmodel.cn/api/anthropic'
+            break
+          case 'dashscope':
+            provider.anthropicApiHost = 'https://dashscope.aliyuncs.com/apps/anthropic'
+            break
+          case 'modelscope':
+            provider.anthropicApiHost = 'https://api-inference.modelscope.cn'
+            break
+          case 'aihubmix':
+            provider.anthropicApiHost = 'https://aihubmix.com'
+            break
+          case 'new-api':
+            provider.anthropicApiHost = provider.apiHost
+            break
+          case 'grok':
+            provider.anthropicApiHost = 'https://api.x.ai'
+            break
+          case 'cherryin':
+            provider.anthropicApiHost = 'https://open.cherryin.net'
+            break
+          case 'longcat':
+            provider.anthropicApiHost = 'https://api.longcat.chat/anthropic'
+            break
+        }
+      })
+      return state
+    } catch (error) {
+      logger.error('migrate 172 error', error as Error)
+      return state
+    }
   }
 }
 
