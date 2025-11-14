@@ -88,13 +88,10 @@ const Inputbar: FC<Props> = ({ assistant: initialAssistant, setActiveTopic, topi
     const cachedToggleState = _defaultMentionsToggleCache[cacheKey]
 
     // Determine if default mentions should be enabled for this topic
-    const isDefaultMentionsEnabled = cachedToggleState !== undefined
-      ? cachedToggleState
-      : initialAssistant.enableDefaultModelMentions !== false
+    const isDefaultMentionsEnabled =
+      cachedToggleState !== undefined ? cachedToggleState : initialAssistant.enableDefaultModelMentions !== false
 
-    const initialMentionedModels = isDefaultMentionsEnabled
-      ? (initialAssistant.defaultModels ?? [])
-      : []
+    const initialMentionedModels = isDefaultMentionsEnabled ? (initialAssistant.defaultModels ?? []) : []
 
     return {
       files: [] as FileType[],
@@ -104,7 +101,13 @@ const Inputbar: FC<Props> = ({ assistant: initialAssistant, setActiveTopic, topi
       couldAddImageFile: false,
       extensions: [] as string[]
     }
-  }, [initialAssistant.id, initialAssistant.knowledge_bases, initialAssistant.defaultModels, initialAssistant.enableDefaultModelMentions, topic.id])
+  }, [
+    initialAssistant.id,
+    initialAssistant.knowledge_bases,
+    initialAssistant.defaultModels,
+    initialAssistant.enableDefaultModelMentions,
+    topic.id
+  ])
 
   return (
     <InputbarToolsProvider

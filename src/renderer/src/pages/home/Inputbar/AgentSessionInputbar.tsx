@@ -202,6 +202,20 @@ const AgentSessionInputbarInner: FC<InnerProps> = ({ assistant, agentId, session
   const sessionTopicId = buildAgentSessionTopicId(sessionId)
   const topicMessages = useAppSelector((state) => selectMessagesForTopic(state, sessionTopicId))
   const loading = useAppSelector((state) => selectNewTopicLoading(state, sessionTopicId))
+  const fallbackTimestamp = useMemo(() => new Date().toISOString(), [])
+  const sessionTopic = useMemo<Topic>(() => {
+    const lastMessage = topicMessages && topicMessages.length > 0 ? topicMessages[topicMessages.length - 1] : undefined
+
+    return {
+      id: sessionTopicId,
+      type: TopicType.Session,
+      assistantId: assistant.id,
+      name: assistant.name || 'Agent Session',
+      createdAt: lastMessage?.createdAt ?? fallbackTimestamp,
+      updatedAt: lastMessage?.updatedAt ?? lastMessage?.createdAt ?? fallbackTimestamp,
+      messages: topicMessages ?? []
+    }
+  }, [assistant.id, assistant.name, fallbackTimestamp, sessionTopicId, topicMessages])
 
   // Calculate vision and image generation support
   const isVisionAssistant = useMemo(() => (assistant.model ? isVisionModel(assistant.model) : false), [assistant.model])
@@ -463,10 +477,12 @@ const AgentSessionInputbarInner: FC<InnerProps> = ({ assistant, agentId, session
   const leftToolbar = useMemo(
     () => (
       <ToolbarGroup>
-        {config.showTools && <InputbarTools scope={scope} assistantId={assistant.id} session={sessionData} />}
+        {config.showTools && (
+          <InputbarTools scope={scope} assistantId={assistant.id} topic={sessionTopic} session={sessionData} />
+        )}
       </ToolbarGroup>
     ),
-    [config.showTools, scope, assistant.id, sessionData]
+    [assistant.id, config.showTools, scope, sessionData, sessionTopic]
   )
   const placeholderText = useMemo(
     () =>

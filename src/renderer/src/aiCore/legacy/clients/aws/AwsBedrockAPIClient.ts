@@ -1,3 +1,4 @@
+import type { BedrockClientConfig } from '@aws-sdk/client-bedrock'
 import { BedrockClient, ListFoundationModelsCommand, ListInferenceProfilesCommand } from '@aws-sdk/client-bedrock'
 import {
   BedrockRuntimeClient,
@@ -85,7 +86,8 @@ export class AwsBedrockAPIClient extends BaseApiClient<
     }
 
     // Build client configuration based on auth type
-    let clientConfig: BedrockRuntimeClientConfig
+    let runtimeClientConfig: BedrockRuntimeClientConfig
+    let bedrockClient: BedrockClient | undefined
 
     if (authType === 'iam') {
       // IAM credentials authentication
@@ -96,13 +98,22 @@ export class AwsBedrockAPIClient extends BaseApiClient<
         throw new Error('AWS credentials are required. Please configure Access Key ID and Secret Access Key.')
       }
 
-      clientConfig = {
+      runtimeClientConfig = {
         region,
         credentials: {
           accessKeyId,
           secretAccessKey
         }
       }
+
+      const bedrockClientConfig: BedrockClientConfig = {
+        region,
+        credentials: {
+          accessKeyId,
+          secretAccessKey
+        }
+      }
+      bedrockClient = new BedrockClient(bedrockClientConfig)
     } else {
       // API Key authentication
       const awsBedrockApiKey = getAwsBedrockApiKey()
@@ -111,15 +122,14 @@ export class AwsBedrockAPIClient extends BaseApiClient<
         throw new Error('AWS Bedrock API Key is required. Please configure API Key in settings.')
       }
 
-      clientConfig = {
+      runtimeClientConfig = {
         region,
         token: { token: awsBedrockApiKey },
         authSchemePreference: ['httpBearerAuth']
       }
     }
 
-    const client = new BedrockRuntimeClient(clientConfig)
-    const bedrockClient = new BedrockClient(clientConfig)
+    const client = new BedrockRuntimeClient(runtimeClientConfig)
 
     this.sdkInstance = { client, bedrockClient, region }
     return this.sdkInstance
@@ -571,6 +581,11 @@ export class AwsBedrockAPIClient extends BaseApiClient<
         byInferenceType: 'ON_DEMAND',
         byOutputModality: 'TEXT'
       })
+      if (!sdk.bedrockClient) {
+        logger.warn('AWS Bedrock control-plane client unavailable; skipping model listing')
+        return []
+      }
+
       const modelsResponse = await sdk.bedrockClient.send(modelsCommand)
 
       // 获取推理配置文件列表

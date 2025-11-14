@@ -180,7 +180,7 @@ export interface NewApiModel extends OpenAI.Models.Model {
  */
 export interface AwsBedrockSdkInstance {
   client: BedrockRuntimeClient
-  bedrockClient: BedrockClient
+  bedrockClient?: BedrockClient
   region: string
 }
 
