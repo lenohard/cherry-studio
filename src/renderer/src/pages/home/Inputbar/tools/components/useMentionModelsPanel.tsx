@@ -41,6 +41,10 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
     files,
     setText
   } = params
+  const emptyMentionedModelsRef = useRef<Model[]>([])
+  const emptyFilesRef = useRef<FileType[]>([])
+  const safeMentionedModels = mentionedModels ?? emptyMentionedModelsRef.current
+  const safeFiles = files ?? emptyFilesRef.current
   const { registerRootMenu, registerTrigger } = quickPanel
   const { open, close, updateList, isVisible, symbol } = quickPanelController
   const { providers } = useProviders()
@@ -49,7 +53,7 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
 
   const hasModelActionRef = useRef(false)
   const triggerInfoRef = useRef<MentionTriggerInfo | undefined>(undefined)
-  const filesRef = useRef(files)
+  const filesRef = useRef<FileType[]>(safeFiles)
 
   const removeAtSymbolAndText = useCallback(
     (currentText: string, caretPosition: number, searchText?: string, fallbackPosition?: number) => {
@@ -100,7 +104,7 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
 
   const onMentionModel = useCallback(
     (model: Model) => {
-      const allowNonVision = !files.some((file) => file.type === FileTypes.IMAGE)
+      const allowNonVision = !safeFiles.some((file) => file.type === FileTypes.IMAGE)
       if (isVisionModel(model) || allowNonVision) {
         setMentionedModels((prev) => {
           const modelId = getModelUniqId(model)
@@ -110,7 +114,7 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
         hasModelActionRef.current = true
       }
     },
-    [files, setMentionedModels]
+    [safeFiles, setMentionedModels]
   )
 
   const onClearMentionModels = useCallback(() => {
@@ -150,7 +154,7 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
             ),
             filterText: getFancyProviderName(provider) + model.name,
             action: () => onMentionModel(model),
-            isSelected: mentionedModels.some((selected) => getModelUniqId(selected) === getModelUniqId(model))
+            isSelected: safeMentionedModels.some((selected) => getModelUniqId(selected) === getModelUniqId(model))
           }))
       )
 
@@ -183,7 +187,7 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
         ),
         filterText: getFancyProviderName(provider) + model.name,
         action: () => onMentionModel(model),
-        isSelected: mentionedModels.some((selected) => getModelUniqId(selected) === getModelUniqId(model))
+        isSelected: safeMentionedModels.some((selected) => getModelUniqId(selected) === getModelUniqId(model))
       }))
 
       if (providerItems.length > 0) {
@@ -275,13 +279,13 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
 
   useEffect(() => {
     if (role !== 'manager') return
-    if (filesRef.current !== files) {
+    if (filesRef.current !== safeFiles) {
       if (isVisible && symbol === QuickPanelReservedSymbol.MentionModels) {
         close()
       }
-      filesRef.current = files
+      filesRef.current = safeFiles
     }
-  }, [close, files, isVisible, role, symbol])
+  }, [close, isVisible, role, safeFiles, symbol])
 
   useEffect(() => {
     if (role !== 'manager') return
