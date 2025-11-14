@@ -657,6 +657,15 @@
       "view_full_content": "查看完整內容"
     },
     "input": {
+      "activity_directory": {
+        "description": "從活動目錄中選擇檔案",
+        "loading": "載入檔案中...",
+        "no_file_found": {
+          "description": "可存取的目錄中沒有檔案",
+          "label": "找不到檔案"
+        },
+        "title": "活動目錄"
+      },
       "auto_resize": "自動調整高度",
       "clear": {
         "content": "您想要清除目前話題的所有訊息嗎？",
@@ -680,6 +689,7 @@
       "new": {
         "context": "清除上下文 {{Command}}"
       },
+      "new_session": "新工作階段 {{Command}}",
       "new_topic": "新話題 {{Command}}",
       "paste_text_file_confirm": "貼到輸入框？",
       "pause": "暫停",
@@ -687,6 +697,10 @@
       "placeholder_without_triggers": "在此輸入您的訊息，按 {{key}} 傳送",
       "send": "傳送",
       "settings": "設定",
+      "slash_commands": {
+        "description": "代理會話斜線命令",
+        "title": "斜線指令"
+      },
       "thinking": {
         "budget_exceeds_max": "思考預算超過最大 Token 數",
         "label": "思考",
@@ -1797,6 +1811,9 @@
     },
     "message": {
       "code_style": "程式碼風格",
+      "compact": {
+        "title": "對話已壓縮"
+      },
       "delete": {
         "content": "確定要刪除此訊息嗎？",
         "title": "刪除訊息"
@@ -2493,6 +2510,7 @@
   },
   "provider": {
     "302ai": "302.AI",
+    "ai-gateway": "AI 閘道器",
     "aihubmix": "AiHubMix",
     "aionly": "唯一AI (AiOnly)",
     "alayanew": "Alaya NeW",
@@ -2503,6 +2521,7 @@
     "baidu-cloud": "百度雲千帆",
     "burncloud": "BurnCloud",
     "cephalon": "Cephalon",
+    "cerebras": "Cerebras AI",
     "cherryin": "CherryIN",
     "copilot": "GitHub Copilot",
     "dashscope": "阿里雲百鍊",
@@ -4485,6 +4504,7 @@
       "confirm": "確認",
       "forward": "前進",
       "multiple": "多選",
+      "noResult": "[to be translated]:No results found",
       "page": "翻頁",
       "select": "選擇",
       "title": "快捷選單"

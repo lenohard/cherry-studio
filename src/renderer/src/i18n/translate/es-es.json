@@ -657,6 +657,15 @@
       "view_full_content": "Ver contenido completo"
     },
     "input": {
+      "activity_directory": {
+        "description": "Seleccionar archivo del directorio de actividad",
+        "loading": "Cargando archivos...",
+        "no_file_found": {
+          "description": "No hay archivos disponibles en los directorios accesibles",
+          "label": "No se encontró ningún archivo"
+        },
+        "title": "Directorio de Actividades"
+      },
       "auto_resize": "Ajuste automático de altura",
       "clear": {
         "content": "¿Estás seguro de que quieres eliminar todos los mensajes de la sesión actual?",
@@ -680,6 +689,7 @@
       "new": {
         "context": "Limpiar contexto {{Command}}"
       },
+      "new_session": "Nueva Sesión {{Command}}",
       "new_topic": "Nuevo tema {{Command}}",
       "paste_text_file_confirm": "¿Pegar en el cuadro de entrada?",
       "pause": "Pausar",
@@ -687,6 +697,10 @@
       "placeholder_without_triggers": "Escribe tu mensaje aquí, presiona {{key}} para enviar",
       "send": "Enviar",
       "settings": "Configuración",
+      "slash_commands": {
+        "description": "Comandos de sesión de agente con barra",
+        "title": "Comandos de barra"
+      },
       "thinking": {
         "budget_exceeds_max": "El presupuesto de pensamiento excede el número máximo de tokens",
         "label": "Pensando",
@@ -1797,6 +1811,9 @@
     },
     "message": {
       "code_style": "Estilo de código",
+      "compact": {
+        "title": "Conversación Compactada"
+      },
       "delete": {
         "content": "¿Está seguro de querer eliminar este mensaje?",
         "title": "Eliminar mensaje"
@@ -2493,6 +2510,7 @@
   },
   "provider": {
     "302ai": "302.AI",
+    "ai-gateway": "Puerta de enlace de IA",
     "aihubmix": "AiHubMix",
     "aionly": "AiOnly",
     "alayanew": "Alaya NeW",
@@ -2503,6 +2521,7 @@
     "baidu-cloud": "Baidu Nube Qiánfān",
     "burncloud": "BurnCloud",
     "cephalon": "Cephalon",
+    "cerebras": "Cerebras AI",
     "cherryin": "CherryIN",
     "copilot": "GitHub Copiloto",
     "dashscope": "Álibaba Nube BaiLiàn",
@@ -4485,6 +4504,7 @@
       "confirm": "Confirmar",
       "forward": "Adelante",
       "multiple": "Selección múltiple",
+      "noResult": "[to be translated]:No results found",
       "page": "Página",
       "select": "Seleccionar",
       "title": "Menú de acceso rápido"
