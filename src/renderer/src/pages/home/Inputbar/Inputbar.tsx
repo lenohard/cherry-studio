@@ -51,6 +51,9 @@ import TokenCount from './TokenCount'
 
 const logger = loggerService.withContext('Inputbar')
 
+// Cache for per-topic default mentions toggle state: `assistantId-topicId` -> boolean
+const _defaultMentionsToggleCache: Record<string, boolean | undefined> = {}
+
 interface Props {
   assistant: Assistant
   setActiveTopic: (topic: Topic) => void
@@ -80,17 +83,28 @@ const Inputbar: FC<Props> = ({ assistant: initialAssistant, setActiveTopic, topi
     toggleExpanded: () => {}
   })
 
-  const initialState = useMemo(
-    () => ({
+  const initialState = useMemo(() => {
+    const cacheKey = `${initialAssistant.id}-${topic.id}`
+    const cachedToggleState = _defaultMentionsToggleCache[cacheKey]
+
+    // Determine if default mentions should be enabled for this topic
+    const isDefaultMentionsEnabled = cachedToggleState !== undefined
+      ? cachedToggleState
+      : initialAssistant.enableDefaultModelMentions !== false
+
+    const initialMentionedModels = isDefaultMentionsEnabled
+      ? (initialAssistant.defaultModels ?? [])
+      : []
+
+    return {
       files: [] as FileType[],
-      mentionedModels: [] as Model[],
+      mentionedModels: initialMentionedModels,
       selectedKnowledgeBases: initialAssistant.knowledge_bases ?? [],
       isExpanded: false,
       couldAddImageFile: false,
       extensions: [] as string[]
-    }),
-    [initialAssistant.knowledge_bases]
-  )
+    }
+  }, [initialAssistant.id, initialAssistant.knowledge_bases, initialAssistant.defaultModels, initialAssistant.enableDefaultModelMentions, topic.id])
 
   return (
     <InputbarToolsProvider
@@ -430,7 +444,7 @@ const InputbarInner: FC<InputbarInnerProps> = ({ assistant: initialAssistant, se
   )
 
   // leftToolbar: 左侧工具栏
-  const leftToolbar = config.showTools ? <InputbarTools scope={scope} assistantId={assistant.id} /> : null
+  const leftToolbar = config.showTools ? <InputbarTools scope={scope} assistantId={assistant.id} topic={topic} /> : null
 
   // rightToolbar: 右侧工具栏
   const rightToolbar = (

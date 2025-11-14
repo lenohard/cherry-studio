@@ -21,6 +21,7 @@ import type {
 import { getToolsForScope } from '@renderer/pages/home/Inputbar/types'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { selectToolOrderForScope, setIsCollapsed, setToolOrder } from '@renderer/store/inputTools'
+import type { Topic } from '@renderer/types'
 import type { InputBarToolType } from '@renderer/types/chat'
 import { classNames } from '@renderer/utils'
 import { Divider, Dropdown } from 'antd'
@@ -34,6 +35,7 @@ import styled from 'styled-components'
 export interface InputbarToolsNewProps {
   scope: InputbarScope
   assistantId: string
+  topic: Topic
   // Session data for Agent Session scope (optional)
   session?: {
     agentId?: string
@@ -54,7 +56,7 @@ const DraggablePortal = ({ children, isDragging }: { children: React.ReactNode; 
   return isDragging ? createPortal(children, document.body) : children
 }
 
-const InputbarTools = ({ scope, assistantId, session }: InputbarToolsNewProps) => {
+const InputbarTools = ({ scope, assistantId, topic, session }: InputbarToolsNewProps) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { assistant, model } = useAssistant(assistantId)
@@ -86,8 +88,8 @@ const InputbarTools = ({ scope, assistantId, session }: InputbarToolsNewProps) =
 
   // Get tools for current scope
   const availableTools = useMemo(() => {
-    return getToolsForScope(scope, { assistant, model, session })
-  }, [scope, assistant, model, session])
+    return getToolsForScope(scope, { assistant, model, session, topic })
+  }, [scope, assistant, model, session, topic])
 
   // Get tool order for current scope
   const toolOrder = useMemo(() => {
@@ -127,6 +129,7 @@ const InputbarTools = ({ scope, assistantId, session }: InputbarToolsNewProps) =
         assistant,
         model,
         session,
+        topic,
         state,
         actions,
         quickPanel,
@@ -134,7 +137,7 @@ const InputbarTools = ({ scope, assistantId, session }: InputbarToolsNewProps) =
         t
       } as ToolRenderContext<S, A>
     },
-    [assistant, model, quickPanelContext, scope, session, t, toolsContext, getQuickPanelApiForTool]
+    [assistant, model, quickPanelContext, scope, session, topic, t, toolsContext, getQuickPanelApiForTool]
   )
 
   // Build tool metadata (without rendering)
