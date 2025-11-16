@@ -8,9 +8,10 @@ import { useTranslation } from 'react-i18next'
 interface Props {
   isDefaultMentionsEnabled: boolean
   onToggleDefaultMentions: () => void
+  onOpenPicker: () => void
 }
 
-const MentionModelsButton: FC<Props> = ({ isDefaultMentionsEnabled, onToggleDefaultMentions }) => {
+const MentionModelsButton: FC<Props> = ({ isDefaultMentionsEnabled, onToggleDefaultMentions, onOpenPicker }) => {
   const { t } = useTranslation()
   const tooltipKey = isDefaultMentionsEnabled
     ? t('assistants.settings.default_models.enabled')
@@ -18,7 +19,15 @@ const MentionModelsButton: FC<Props> = ({ isDefaultMentionsEnabled, onToggleDefa
 
   return (
     <Tooltip placement="top" title={tooltipKey} mouseLeaveDelay={0} arrow>
-      <ActionIconButton onClick={onToggleDefaultMentions} active={isDefaultMentionsEnabled}>
+      <ActionIconButton
+        onClick={(event) => {
+          if (event.metaKey || event.ctrlKey) {
+            onToggleDefaultMentions()
+            return
+          }
+          onOpenPicker()
+        }}
+        active={isDefaultMentionsEnabled}>
         <AtSign size={18} />
       </ActionIconButton>
     </Tooltip>

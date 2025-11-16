@@ -306,9 +306,17 @@ const InputbarInner: FC<InputbarInnerProps> = ({ assistant: initialAssistant, se
       const next = !prev
       manualMentionUpdateRef.current = false
       applyMentionedModels(next ? assistantDefaultModels : [])
+
+      const cacheKey = `${assistant.id}-${topic.id}`
+      _defaultMentionsToggleCache[cacheKey] = next
+
+      if (assistant.enableDefaultModelMentions !== next) {
+        updateAssistant({ enableDefaultModelMentions: next })
+      }
+
       return next
     })
-  }, [assistantDefaultModels, applyMentionedModels, setDefaultMentionsEnabled])
+  }, [applyMentionedModels, assistant.enableDefaultModelMentions, assistantDefaultModels, setDefaultMentionsEnabled, topic.id, updateAssistant, assistant.id])
 
   const sendMessage = useCallback(async () => {
     if (checkRateLimit(assistant)) {
