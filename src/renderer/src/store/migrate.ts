@@ -2971,28 +2971,22 @@ const migrateConfig = {
       return state
     }
   },
-  '163': (state: RootState) => {
+  '175': (state: RootState) => {
     try {
-      const updateModelTextDelta = (model?: Model) => {
-        if (model) {
-          model.supported_text_delta = true
-          if (isNotSupportedTextDelta(model)) {
-            model.supported_text_delta = false
-          }
-        }
-      }
-
-      // Update text delta for defaultModels on assistants
       state.assistants.assistants.forEach((assistant) => {
-        assistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
+        // @ts-expect-error removed type 'off'
+        if (assistant.settings?.reasoning_effort === 'off') {
+          assistant.settings.reasoning_effort = 'none'
+        }
+        // @ts-expect-error removed type 'off'
+        if (assistant.settings?.reasoning_effort_cache === 'off') {
+          assistant.settings.reasoning_effort_cache = 'none'
+        }
       })
-
-      // Update text delta for defaultModels on default assistant
-      state.assistants.defaultAssistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
-
+      logger.info('migrate 175 success')
       return state
     } catch (error) {
-      logger.error('migrate 163 error', error as Error)
+      logger.error('migrate 175 error', error as Error)
       return state
     }
   }
