@@ -99,66 +99,6 @@ export default class AppUpdater {
     this.autoUpdater = autoUpdater
   }
 
-  private async _getReleaseVersionFromGithub(channel: UpgradeChannel) {
-    const githubToken = process.env.GH_TOKEN || process.env.GITHUB_TOKEN
-    const headers: Record<string, string> = {
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      'Accept-Language': 'en-US,en;q=0.9'
-    }
-    if (githubToken) {
-      headers.Authorization = `Bearer ${githubToken}`
-      logger.info('using github token for release lookup')
-    }
-    try {
-      logger.info(`get release version from github: ${channel}`)
-      const responses = await net.fetch('https://api.github.com/repos/lenohard/cherry-studio/releases?per_page=8', {
-        headers
-      })
-      const data = (await responses.json()) as GithubReleaseInfo[]
-      let mightHaveLatest = false
-      const release: GithubReleaseInfo | undefined = data.find((item: GithubReleaseInfo) => {
-        if (!item.draft && !item.prerelease) {
-          mightHaveLatest = true
-        }
-
-        return item.prerelease && item.tag_name.includes(`-${channel}.`)
-      })
-
-      if (!release) {
-        return null
-      }
-
-      // if the release version is the same as the current version, return null
-      if (release.tag_name === app.getVersion()) {
-        return null
-      }
-
-      if (mightHaveLatest) {
-        logger.info(`might have latest release, get latest release`)
-        const latestReleaseResponse = await net.fetch(
-          'https://api.github.com/repos/lenohard/cherry-studio/releases/latest',
-          {
-            headers
-          }
-        )
-        const latestRelease = (await latestReleaseResponse.json()) as GithubReleaseInfo
-        if (semver.gt(latestRelease.tag_name, release.tag_name)) {
-          logger.info(
-            `latest release version is ${latestRelease.tag_name}, prerelease version is ${release.tag_name}, return null`
-          )
-          return null
-        }
-      }
-
-      logger.info(`release url is ${release.tag_name}, set channel to ${channel}`)
-      return `https://github.com/lenohard/cherry-studio/releases/download/${release.tag_name}`
-    } catch (error) {
-      logger.error('Failed to get latest not draft version from github:', error as Error)
-      return null
-    }
-  }
-
   public setAutoUpdate(isActive: boolean) {
     autoUpdater.autoDownload = isActive
     autoUpdater.autoInstallOnAppQuit = isActive

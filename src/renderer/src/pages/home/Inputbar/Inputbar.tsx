@@ -316,7 +316,15 @@ const InputbarInner: FC<InputbarInnerProps> = ({ assistant: initialAssistant, se
 
       return next
     })
-  }, [applyMentionedModels, assistant.enableDefaultModelMentions, assistantDefaultModels, setDefaultMentionsEnabled, topic.id, updateAssistant, assistant.id])
+  }, [
+    applyMentionedModels,
+    assistant.enableDefaultModelMentions,
+    assistantDefaultModels,
+    setDefaultMentionsEnabled,
+    topic.id,
+    updateAssistant,
+    assistant.id
+  ])
 
   const sendMessage = useCallback(async () => {
     if (checkRateLimit(assistant)) {
@@ -577,7 +585,7 @@ const InputbarInner: FC<InputbarInnerProps> = ({ assistant: initialAssistant, se
   )
 
   // leftToolbar: 左侧工具栏
-  const leftToolbar = config.showTools ? <InputbarTools scope={scope} assistantId={assistant.id} /> : null
+  const leftToolbar = config.showTools ? <InputbarTools scope={scope} assistantId={assistant.id} topic={topic} /> : null
 
   // rightToolbar: 右侧工具栏
   const rightToolbar = (

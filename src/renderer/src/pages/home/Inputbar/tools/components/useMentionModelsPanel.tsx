@@ -261,7 +261,8 @@ export const useMentionModelsPanel = (params: Params, role: 'button' | 'manager'
     removeAtSymbolAndText,
     setText,
     t,
-    updateAssistant
+    updateAssistant,
+    safeMentionedModels
   ])
 
   const openQuickPanel = useCallback(
