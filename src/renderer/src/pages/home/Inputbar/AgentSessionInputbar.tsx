@@ -67,7 +67,8 @@ const AgentSessionInputbar: FC<Props> = ({ agentId, sessionId }) => {
     resizeTextArea: () => {},
     // oxlint-disable-next-line no-unused-vars
     onTextChange: (_updater: React.SetStateAction<string> | ((prev: string) => string)) => {},
-    toggleExpanded: () => {}
+    toggleExpanded: () => {},
+    toggleDefaultMentions: () => {}
   })
 
   // Create assistant stub with session data
@@ -136,7 +137,8 @@ const AgentSessionInputbar: FC<Props> = ({ agentId, sessionId }) => {
         addNewTopic: () => {},
         clearTopic: () => {},
         onNewContext: () => {},
-        toggleExpanded: () => actionsRef.current.toggleExpanded()
+        toggleExpanded: () => actionsRef.current.toggleExpanded(),
+        toggleDefaultMentions: () => actionsRef.current.toggleDefaultMentions()
       }}>
       <AgentSessionInputbarInner
         assistant={assistantStub}
@@ -163,6 +165,7 @@ interface InnerProps {
     resizeTextArea: () => void
     onTextChange: (updater: React.SetStateAction<string> | ((prev: string) => string)) => void
     toggleExpanded: (nextState?: boolean) => void
+    toggleDefaultMentions: () => void
   }>
 }
 
@@ -245,7 +248,8 @@ const AgentSessionInputbarInner: FC<InnerProps> = ({ assistant, agentId, session
     actionsRef.current = {
       resizeTextArea,
       onTextChange: setText,
-      toggleExpanded: handleToggleExpanded
+      toggleExpanded: handleToggleExpanded,
+      toggleDefaultMentions: () => {}
     }
   }, [resizeTextArea, setText, actionsRef, handleToggleExpanded])
 

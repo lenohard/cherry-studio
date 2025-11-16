@@ -1,5 +1,4 @@
 import { defineTool, registerTool, TopicType } from '@renderer/pages/home/Inputbar/types'
-import type React from 'react'
 
 import MentionModelsButton from './components/MentionModelsButton'
 import MentionModelsQuickPanelManager from './components/MentionModelsQuickPanelManager'

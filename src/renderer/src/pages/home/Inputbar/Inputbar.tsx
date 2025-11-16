@@ -212,6 +212,14 @@ const InputbarInner: FC<InputbarInnerProps> = ({ assistant: initialAssistant, se
     setCouldAddImageFile(canAddImageFile)
   }, [canAddImageFile, setCouldAddImageFile])
 
+  const applyMentionedModels = useCallback(
+    (nextModels: Model[]) => {
+      mentionSyncRef.current = true
+      setMentionedModels(() => nextModels)
+    },
+    [setMentionedModels]
+  )
+
   useEffect(() => {
     const defaultsEnabled = assistant.enableDefaultModelMentions !== false
     const cached = _mentionedModelsCache[assistant.id]
@@ -254,13 +262,7 @@ const InputbarInner: FC<InputbarInnerProps> = ({ assistant: initialAssistant, se
     if (next !== defaultMentionsEnabled) {
       setDefaultMentionsEnabled(next)
     }
-  }, [
-    assistant.enableDefaultModelMentions,
-    assistant.id,
-    defaultMentionsEnabled,
-    setDefaultMentionsEnabled,
-    topic.id
-  ])
+  }, [assistant.enableDefaultModelMentions, assistant.id, defaultMentionsEnabled, setDefaultMentionsEnabled, topic.id])
 
   useEffect(() => {
     const cacheKey = `${assistant.id}-${topic.id}`
@@ -298,14 +300,6 @@ const InputbarInner: FC<InputbarInnerProps> = ({ assistant: initialAssistant, se
   useEffect(() => {
     defaultMentionsToggleRef.current = defaultMentionsEnabled
   }, [defaultMentionsEnabled])
-
-  const applyMentionedModels = useCallback(
-    (nextModels: Model[]) => {
-      mentionSyncRef.current = true
-      setMentionedModels(() => nextModels)
-    },
-    [setMentionedModels]
-  )
 
   const toggleDefaultMentions = useCallback(() => {
     setDefaultMentionsEnabled((prev) => {
@@ -459,7 +453,16 @@ const InputbarInner: FC<InputbarInnerProps> = ({ assistant: initialAssistant, se
       toggleExpanded: handleToggleExpanded,
       toggleDefaultMentions
     }
-  }, [resizeTextArea, addNewTopic, clearTopic, onNewContext, setText, handleToggleExpanded, toggleDefaultMentions, actionsRef])
+  }, [
+    resizeTextArea,
+    addNewTopic,
+    clearTopic,
+    onNewContext,
+    setText,
+    handleToggleExpanded,
+    toggleDefaultMentions,
+    actionsRef
+  ])
 
   useShortcut(
     'new_topic',
