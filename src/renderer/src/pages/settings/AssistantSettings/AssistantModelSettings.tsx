@@ -35,7 +35,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
   const [toolUseMode, setToolUseMode] = useState(assistant?.settings?.toolUseMode ?? 'prompt')
   const [defaultModel, setDefaultModel] = useState(assistant?.defaultModel)
   const [topP, setTopP] = useState(assistant?.settings?.topP ?? 1)
-  const [enableTopP, setEnableTopP] = useState(assistant?.settings?.enableTopP ?? false)
+  const [enableTopP, setEnableTopP] = useState(assistant?.settings?.enableTopP ?? true)
   const [customParameters, setCustomParameters] = useState<AssistantSettingCustomParameters[]>(
     assistant?.settings?.customParameters ?? []
   )
@@ -171,7 +171,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
     setMaxTokens(0)
     setStreamOutput(true)
     setTopP(1)
-    setEnableTopP(false)
+    setEnableTopP(true)
     setCustomParameters([])
     setToolUseMode('prompt')
     updateAssistantSettings({
@@ -182,7 +182,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
       maxTokens: 0,
       streamOutput: true,
       topP: 1,
-      enableTopP: false,
+      enableTopP: true,
       customParameters: [],
       toolUseMode: 'prompt'
     })
@@ -418,7 +418,6 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
                 setTimeoutTimer('contextCount_onChange', () => updateAssistantSettings({ contextCount: value }), 500)
               }
             }}
-            formatter={(value) => (value === MAX_CONTEXT_COUNT ? t('chat.settings.max') : (value ?? ''))}
             style={{ width: '100%' }}
           />
         </Col>
@@ -433,7 +432,7 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
             value={typeof contextCount === 'number' ? contextCount : 0}
             marks={{ 0: '0', 25: '25', 50: '50', 75: '75', 100: t('chat.settings.max') }}
             step={1}
-            tooltip={{ formatter: formatSliderTooltip, open: false }}
+            tooltip={{ formatter: formatSliderTooltip }}
           />
         </Col>
       </Row>

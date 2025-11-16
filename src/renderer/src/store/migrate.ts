@@ -2970,6 +2970,31 @@ const migrateConfig = {
       logger.error('migrate 174 error', error as Error)
       return state
     }
+  },
+  '163': (state: RootState) => {
+    try {
+      const updateModelTextDelta = (model?: Model) => {
+        if (model) {
+          model.supported_text_delta = true
+          if (isNotSupportedTextDelta(model)) {
+            model.supported_text_delta = false
+          }
+        }
+      }
+
+      // Update text delta for defaultModels on assistants
+      state.assistants.assistants.forEach((assistant) => {
+        assistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
+      })
+
+      // Update text delta for defaultModels on default assistant
+      state.assistants.defaultAssistant.defaultModels?.forEach((model) => updateModelTextDelta(model))
+
+      return state
+    } catch (error) {
+      logger.error('migrate 163 error', error as Error)
+      return state
+    }
   }
 }
 

@@ -1,7 +1,10 @@
 import { defineTool, registerTool, TopicType } from '@renderer/pages/home/Inputbar/types'
+import type { FileType, Model } from '@renderer/types'
+import type React from 'react'
 
 import MentionModelsButton from './components/MentionModelsButton'
 import MentionModelsQuickPanelManager from './components/MentionModelsQuickPanelManager'
+import { useMentionModelsPanel } from './components/useMentionModelsPanel'
 
 /**
  * Mention Models Tool
@@ -15,15 +18,36 @@ const mentionModelsTool = defineTool({
 
   visibleInScopes: [TopicType.Chat, 'mini-window'],
   dependencies: {
-    state: [] as const,
-    actions: ['setMentionedModels'] as const
+    state: ['mentionedModels', 'files', 'couldMentionNotVisionModel', 'defaultMentionsEnabled'] as const,
+    actions: ['setMentionedModels', 'onTextChange', 'toggleDefaultMentions'] as const
   },
 
   render: function MentionModelsToolRender(context) {
-    const { actions, assistant, topic } = context
-    const { setMentionedModels } = actions
+    const { state, actions, assistant, quickPanel, quickPanelController } = context
+    const { defaultMentionsEnabled, mentionedModels, files, couldMentionNotVisionModel } = state
+    const { toggleDefaultMentions, setMentionedModels, onTextChange } = actions
 
-    return <MentionModelsButton setMentionedModels={setMentionedModels} assistant={assistant} topic={topic} />
+    const { handleOpenQuickPanel } = useMentionModelsPanel(
+      {
+        quickPanel,
+        quickPanelController,
+        assistantId: assistant.id,
+        mentionedModels: mentionedModels as Model[],
+        setMentionedModels: setMentionedModels as React.Dispatch<React.SetStateAction<Model[]>>,
+        couldMentionNotVisionModel,
+        files: files as FileType[],
+        setText: onTextChange as React.Dispatch<React.SetStateAction<string>>
+      },
+      'button'
+    )
+
+    return (
+      <MentionModelsButton
+        isDefaultMentionsEnabled={defaultMentionsEnabled}
+        onToggleDefaultMentions={toggleDefaultMentions}
+        onOpenPicker={handleOpenQuickPanel}
+      />
+    )
   },
   quickPanelManager: MentionModelsQuickPanelManager
 })

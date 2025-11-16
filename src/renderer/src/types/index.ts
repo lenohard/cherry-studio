@@ -37,6 +37,8 @@ export type Assistant = {
   model?: Model
   defaultModel?: Model
   defaultModels?: Model[]
+  enableDefaultModelMentions?: boolean
+  // This field should be considered as not Partial and not optional in v2
   settings?: Partial<AssistantSettings>
   messages?: AssistantMessage[]
   /** enableWebSearch 代表使用模型内置网络搜索功能 */
@@ -50,7 +52,6 @@ export type Assistant = {
   regularPhrases?: QuickPhrase[] // Added for regular phrase
   tags?: string[] // 助手标签
   enableMemory?: boolean
-  enableDefaultModelMentions?: boolean
   // for translate. 更好的做法是定义base assistant，把 Assistant 作为多种不同定义 assistant 的联合类型，但重构代价太大
   content?: string
   targetLanguage?: TranslateLanguage

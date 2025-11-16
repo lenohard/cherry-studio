@@ -50,6 +50,7 @@ export function getDefaultAssistant(): Assistant {
     messages: [],
     type: 'assistant',
     defaultModels: [],
+    enableDefaultModelMentions: true,
     regularPhrases: [], // Added regularPhrases
     settings: DEFAULT_ASSISTANT_SETTINGS
   }

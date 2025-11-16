@@ -10,6 +10,7 @@ interface ManagerProps {
 
 const MentionModelsQuickPanelManager = ({ context }: ManagerProps) => {
   const {
+    assistant,
     quickPanel,
     quickPanelController,
     state: { mentionedModels, files, couldMentionNotVisionModel },
@@ -20,6 +21,7 @@ const MentionModelsQuickPanelManager = ({ context }: ManagerProps) => {
     {
       quickPanel,
       quickPanelController,
+      assistantId: assistant.id,
       mentionedModels: mentionedModels as Model[],
       setMentionedModels: setMentionedModels as React.Dispatch<React.SetStateAction<Model[]>>,
       couldMentionNotVisionModel,
