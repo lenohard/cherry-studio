@@ -48,8 +48,9 @@ export abstract class OpenAIBaseClient<
   }
 
   // 仅适用于openai
-  override getBaseURL(isSupportedAPIVerion: boolean = true): string {
-    return formatApiHost(this.provider.apiHost, isSupportedAPIVerion)
+  override getBaseURL(): string {
+    const host = this.provider.apiHost
+    return formatApiHost(host)
   }
 
   override async generateImage({
@@ -143,11 +144,6 @@ export abstract class OpenAIBaseClient<
     }
 
     let apiKeyForSdkInstance = this.apiKey
-    let baseURLForSdkInstance = this.getBaseURL()
-    let headersForSdkInstance = {
-      ...this.defaultHeaders(),
-      ...this.provider.extra_headers
-    }
 
     if (this.provider.id === 'copilot') {
       const defaultHeaders = store.getState().copilot.defaultHeaders
@@ -155,11 +151,6 @@ export abstract class OpenAIBaseClient<
       // this.provider.apiKey不允许修改
       // this.provider.apiKey = token
       apiKeyForSdkInstance = token
-      baseURLForSdkInstance = this.getBaseURL(false)
-      headersForSdkInstance = {
-        ...headersForSdkInstance,
-        ...COPILOT_DEFAULT_HEADERS
-      }
     }
 
     if (this.provider.id === 'azure-openai' || this.provider.type === 'azure-openai') {
@@ -173,8 +164,12 @@ export abstract class OpenAIBaseClient<
       this.sdkInstance = new OpenAI({
         dangerouslyAllowBrowser: true,
         apiKey: apiKeyForSdkInstance,
-        baseURL: baseURLForSdkInstance,
-        defaultHeaders: headersForSdkInstance
+        baseURL: this.getBaseURL(),
+        defaultHeaders: {
+          ...this.defaultHeaders(),
+          ...this.provider.extra_headers,
+          ...(this.provider.id === 'copilot' ? COPILOT_DEFAULT_HEADERS : {})
+        }
       }) as TSdkInstance
     }
     return this.sdkInstance

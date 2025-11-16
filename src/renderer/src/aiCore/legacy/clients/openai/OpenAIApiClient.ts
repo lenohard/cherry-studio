@@ -35,7 +35,6 @@ import {
   isSupportedThinkingTokenModel,
   isSupportedThinkingTokenQwenModel,
   isSupportedThinkingTokenZhipuModel,
-  isSupportVerbosityModel,
   isVisionModel,
   MODEL_SUPPORTED_REASONING_EFFORT,
   ZHIPU_RESULT_TOKENS
@@ -734,13 +733,6 @@ export class OpenAIAPIClient extends OpenAIBaseClient<
           ...modalities,
           // groq 有不同的 service tier 配置，不符合 openai 接口类型
           service_tier: this.getServiceTier(model) as OpenAIServiceTier,
-          ...(isSupportVerbosityModel(model)
-            ? {
-                text: {
-                  verbosity: this.getVerbosity(model)
-                }
-              }
-            : {}),
           ...this.getProviderSpecificParameters(assistant, model),
           ...reasoningEffort,
           ...getOpenAIWebSearchParams(model, enableWebSearch),

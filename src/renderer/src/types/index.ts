@@ -85,10 +85,7 @@ const ThinkModelTypes = [
   'o',
   'openai_deep_research',
   'gpt5',
-  'gpt5_1',
   'gpt5_codex',
-  'gpt5_1_codex',
-  'gpt5pro',
   'grok',
   'grok4_fast',
   'gemini',
@@ -105,7 +102,7 @@ const ThinkModelTypes = [
 ] as const
 
 export type ReasoningEffortOption = NonNullable<OpenAI.ReasoningEffort> | 'auto'
-export type ThinkingOption = ReasoningEffortOption
+export type ThinkingOption = ReasoningEffortOption | 'off'
 export type ThinkingModelType = (typeof ThinkModelTypes)[number]
 export type ThinkingOptionConfig = Record<ThinkingModelType, ThinkingOption[]>
 export type ReasoningEffortConfig = Record<ThinkingModelType, ReasoningEffortOption[]>
@@ -116,7 +113,6 @@ export function isThinkModelType(type: string): type is ThinkingModelType {
 }
 
 export const EFFORT_RATIO: EffortRatio = {
-  none: 0.01,
   minimal: 0.05,
   low: 0.05,
   medium: 0.5,
