@@ -490,7 +490,7 @@ const AgentSessionInputbarInner: FC<InnerProps> = ({ assistant, agentId, session
   )
   const placeholderText = useMemo(
     () =>
-      t('chat.input.placeholder', {
+      t('agent.input.placeholder', {
         key: getSendMessageShortcutLabel(sendMessageShortcut)
       }),
     [sendMessageShortcut, t]

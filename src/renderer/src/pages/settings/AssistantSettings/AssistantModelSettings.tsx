@@ -10,6 +10,7 @@ import { isEmbeddingModel, isRerankModel } from '@renderer/config/models'
 import { useTimer } from '@renderer/hooks/useTimer'
 import { SettingRow } from '@renderer/pages/settings'
 import { getModelUniqId } from '@renderer/services/ModelService'
+import { DEFAULT_ASSISTANT_SETTINGS } from '@renderer/services/AssistantService'
 import type { Assistant, AssistantSettingCustomParameters, AssistantSettings, Model } from '@renderer/types'
 import { modalConfirm } from '@renderer/utils'
 import { Button, Col, Divider, Input, InputNumber, Row, Select, Slider, Switch, Tooltip } from 'antd'
@@ -32,7 +33,9 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
   const [enableMaxTokens, setEnableMaxTokens] = useState(assistant?.settings?.enableMaxTokens ?? false)
   const [maxTokens, setMaxTokens] = useState(assistant?.settings?.maxTokens ?? 0)
   const [streamOutput, setStreamOutput] = useState(assistant?.settings?.streamOutput)
-  const [toolUseMode, setToolUseMode] = useState(assistant?.settings?.toolUseMode ?? 'prompt')
+  const [toolUseMode, setToolUseMode] = useState<AssistantSettings['toolUseMode']>(
+    assistant?.settings?.toolUseMode ?? 'function'
+  )
   const [defaultModel, setDefaultModel] = useState(assistant?.defaultModel)
   const [topP, setTopP] = useState(assistant?.settings?.topP ?? 1)
   const [enableTopP, setEnableTopP] = useState(assistant?.settings?.enableTopP ?? true)
@@ -164,28 +167,17 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
   }
 
   const onReset = () => {
-    setTemperature(DEFAULT_TEMPERATURE)
-    setEnableTemperature(true)
-    setContextCount(DEFAULT_CONTEXTCOUNT)
-    setEnableMaxTokens(false)
-    setMaxTokens(0)
-    setStreamOutput(true)
-    setTopP(1)
-    setEnableTopP(true)
-    setCustomParameters([])
-    setToolUseMode('prompt')
-    updateAssistantSettings({
-      temperature: DEFAULT_TEMPERATURE,
-      enableTemperature: true,
-      contextCount: DEFAULT_CONTEXTCOUNT,
-      enableMaxTokens: false,
-      maxTokens: 0,
-      streamOutput: true,
-      topP: 1,
-      enableTopP: true,
-      customParameters: [],
-      toolUseMode: 'prompt'
-    })
+    setTemperature(DEFAULT_ASSISTANT_SETTINGS.temperature)
+    setEnableTemperature(DEFAULT_ASSISTANT_SETTINGS.enableTemperature ?? true)
+    setContextCount(DEFAULT_ASSISTANT_SETTINGS.contextCount)
+    setEnableMaxTokens(DEFAULT_ASSISTANT_SETTINGS.enableMaxTokens ?? false)
+    setMaxTokens(DEFAULT_ASSISTANT_SETTINGS.maxTokens ?? 0)
+    setStreamOutput(DEFAULT_ASSISTANT_SETTINGS.streamOutput)
+    setTopP(DEFAULT_ASSISTANT_SETTINGS.topP)
+    setEnableTopP(DEFAULT_ASSISTANT_SETTINGS.enableTopP ?? false)
+    setCustomParameters(DEFAULT_ASSISTANT_SETTINGS.customParameters ?? [])
+    setToolUseMode(DEFAULT_ASSISTANT_SETTINGS.toolUseMode)
+    updateAssistantSettings(DEFAULT_ASSISTANT_SETTINGS)
   }
   const modelFilter = (model: Model) => !isEmbeddingModel(model) && !isRerankModel(model)
 
