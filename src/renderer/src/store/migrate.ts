@@ -2970,6 +2970,43 @@ const migrateConfig = {
       logger.error('migrate 174 error', error as Error)
       return state
     }
+  },
+  '175': (state: RootState) => {
+    try {
+      state.assistants.assistants.forEach((assistant) => {
+        // @ts-ignore
+        if (assistant.settings?.reasoning_effort === 'off') {
+          // @ts-ignore
+          assistant.settings.reasoning_effort = 'none'
+        }
+        // @ts-ignore
+        if (assistant.settings?.reasoning_effort_cache === 'off') {
+          // @ts-ignore
+          assistant.settings.reasoning_effort_cache = 'none'
+        }
+      })
+      logger.info('migrate 175 success')
+      return state
+    } catch (error) {
+      logger.error('migrate 175 error', error as Error)
+      return state
+    }
+  },
+  '176': (state: RootState) => {
+    try {
+      state.llm.providers.forEach((provider) => {
+        if (provider.id === SystemProviderIds.qiniu) {
+          provider.anthropicApiHost = 'https://api.qnaigc.com'
+        }
+        if (provider.id === SystemProviderIds.longcat) {
+          provider.anthropicApiHost = 'https://api.longcat.chat/anthropic'
+        }
+      })
+      return state
+    } catch (error) {
+      logger.error('migrate 176 error', error as Error)
+      return state
+    }
   }
 }
 
